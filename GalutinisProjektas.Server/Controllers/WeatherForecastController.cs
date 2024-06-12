@@ -1,3 +1,4 @@
+using GalutinisProjektas.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GalutinisProjektas.Server.Controllers
