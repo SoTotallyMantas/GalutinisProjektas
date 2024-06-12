@@ -30,7 +30,14 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
             }
 
-            return Ok(serviceResponse.Data);
+            var airPollutionResponse = serviceResponse.Data;
+            airPollutionResponse.Links.Add(new HATEOASLink
+            {
+                Href = Url.Link("air-pollution", new { latitude, longitude }),
+                Rel = "self",
+                Method = "GET"
+            });
+            return Ok(airPollutionResponse);
             
            
         }
