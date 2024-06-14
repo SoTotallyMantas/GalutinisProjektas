@@ -7,7 +7,9 @@ namespace GalutinisProjektas.Server.Service
     public class OpenWeatherMapService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenWeatherMapService> logger)
     {
         private readonly HttpClient _httpClient = httpClient;
+#pragma warning disable CS8601 // Possible null reference assignment.
         private readonly string _apiKey = configuration["OpenWeatherMap:ApiKey"];  // API key is stored in appsettings.json
+#pragma warning restore CS8601 // Possible null reference assignment.
         private readonly ILogger<OpenWeatherMapService> _logger = logger;
 
 

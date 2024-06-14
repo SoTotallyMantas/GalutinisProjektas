@@ -14,16 +14,16 @@ namespace GalutinisProjektas.Server.Models.ElectricityResponse
         public decimal ElectricityValue { get; set; }
 
         [JsonPropertyName("estimated_at")]
-        public string EstimatedAt { get; set; }
+        public DateTime EstimatedAt { get; set; }
 
         [JsonPropertyName("carbon_g")]
         public int CarbonG { get; set; }
         [JsonPropertyName("carbon_lb")]
-        public int CarbonLb { get; set; }
+        public double CarbonLb { get; set; }
         [JsonPropertyName("carbon_kg")]
-        public int CarbonKg { get; set; }
+        public double CarbonKg { get; set; }
         [JsonPropertyName("carbon_mt")]
-        public int CarbonMt { get; set; }
+        public double CarbonMt { get; set; }
 
     }
 }

@@ -5,6 +5,8 @@ namespace GalutinisProjektas.Server.Models.FuelCombustionResponse
     public class FuelCumbustionEstimateResponse
     {
         [JsonPropertyName("data")]
-        public FuelCombustionResponseData Data { get; set; }
+        public required FuelCombustionResponseData Data { get; set; }
+
+        public List<HATEOASLink> Links { get; set; } = new List<HATEOASLink>();
     }
 }

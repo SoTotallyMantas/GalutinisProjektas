@@ -8,7 +8,6 @@ namespace GalutinisProjektas.Server.Models.FlightResponse
         public string DepartureAirport { get; set; }
         [JsonPropertyName("destination_airport")]
         public string DestinationAirport { get; set; }
-        [JsonPropertyName("cabin_class")]
-        public string? CabinClass { get; set; }
+
     }
 }
