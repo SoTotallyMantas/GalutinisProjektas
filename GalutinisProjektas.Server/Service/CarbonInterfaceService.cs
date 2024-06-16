@@ -1,8 +1,8 @@
-﻿using GalutinisProjektas.Server.Models;
-using GalutinisProjektas.Server.Models.Carbon;
+﻿using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
+using GalutinisProjektas.Server.Models.UtilityModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Text;

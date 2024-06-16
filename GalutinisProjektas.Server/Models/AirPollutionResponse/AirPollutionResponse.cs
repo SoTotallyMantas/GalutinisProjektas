@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using System.Collections.Generic;
+using GalutinisProjektas.Server.Models.UtilityModels;
 namespace GalutinisProjektas.Server.Models.AirPollutionResponse
 {
     public class AirPollutionResponse

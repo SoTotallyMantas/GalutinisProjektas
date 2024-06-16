@@ -3,9 +3,11 @@ using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
+using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GalutinisProjektas.Server.Controllers
 {
@@ -21,7 +23,17 @@ namespace GalutinisProjektas.Server.Controllers
             _carbonInterfaceService = carbonInterfaceService;
             _logger = logger;
         }
-
+        /// <summary>
+        ///    Retrieves the carbon emissions estimate for electricity usage
+        /// </summary>
+        /// 
+        /// <param name="request"></param> CarbonElectricity object containing the electricity unit, value, country 
+        /// <returns>Electricity carbon emissions Estimate</returns>
+        /// <remarks>
+        ///  Queries the CarbonInterface API for carbon emissions estimate based on Country, Electricity unit and value
+        ///  </remarks>
+        ///  <response code="201">Returns the carbon emissions estimate for electricity usage</response>
+        ///  <response code="400">If the request is invalid</response>
         [HttpPost("Electricity", Name = "Electricity")]
         [ProducesResponseType(typeof(ElectricityEstimateResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -37,10 +49,10 @@ namespace GalutinisProjektas.Server.Controllers
                     return StatusCode(result.StatusCode, result.ErrorMessage);
                 }
                 var electricityEstimateResponse = result.Data;
-                var state = request.state == null ? String.Empty : request.state;
+                
                 electricityEstimateResponse.Links.Add(new HATEOASLink
                 {
-                    Href = Url.Link("Electricity", new { request.electricity_unit, request.electricity_value, request.country, state }),
+                    Href = Url.Link("Electricity", new { request.electricity_unit, request.electricity_value, request.country}),
                     Rel = "self",
                     Method = "Post"
                 });
@@ -56,6 +68,16 @@ namespace GalutinisProjektas.Server.Controllers
 
 
         }
+        /// <summary>
+        /// Retrieves the carbon emissions estimate for a flight
+        /// </summary>
+        /// <param name="request"></param> CarbonFlight object containing the flight distance, distance unit, country and flight destination/departure
+        /// <returns> Flight carbon emissions estimate</returns>
+        /// <remarks> 
+        /// Queries the CarbonInterface API for carbon emissions estimate based on flight distance, distance unit, country and flight destination/departure
+        ///  </remarks>
+        /// <response code="201">Returns the carbon emissions estimate for Flight</response>
+        ///  <response code="400">If the request is invalid</response>
 
         [HttpPost("Flight", Name ="Flight")]
         [ProducesResponseType(typeof(FlightEstimateResponse), 201)]
@@ -87,7 +109,16 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
+        /// <summary>
+        /// Retrieves the carbon emissions estimate for fuel combustions
+        /// </summary>
+        /// <param name="request"></param> CarbonFuelCombustion object containing the Fuel source type, unit, value
+        /// <returns> Fuel combustion carbon emissions estimate</returns>
+        /// <remarks> 
+        /// Queries the CarbonInterface API for carbon emissions estimate based on Fuel source type, unit, value
+        ///  </remarks>
+        /// <response code="201">Returns the carbon emissions estimate for Fuel Combustion</response>
+        ///  <response code="400">If the request is invalid</response>
         [HttpPost("Fuel", Name = "Fuel")]
         [ProducesResponseType(typeof(FuelCumbustionEstimateResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

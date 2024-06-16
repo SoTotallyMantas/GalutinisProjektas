@@ -1,5 +1,6 @@
 ﻿using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Models.AirPollutionResponse;
+using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -36,10 +37,10 @@ namespace GalutinisProjektas.Server.Controllers
          /// <remarks>
          ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
          ///  </remarks>
-         /// <response code="200">Returns the air pollution data for the specified location</response>
+         /// <response code="201">Returns the air pollution data for the specified location</response>
          /// <response code="400">If the request is invalid</response>
         [HttpPost(Name = RouteName)]
-        [ProducesResponseType(typeof(AirPollutionResponse), 200)]
+        [ProducesResponseType(typeof(AirPollutionResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         
         public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
@@ -47,7 +48,7 @@ namespace GalutinisProjektas.Server.Controllers
             try
             {
                 var serviceResponse = await _openWeatherMapService.GetAirPollutionDataAsync(latitude, longitude);
-                if (serviceResponse.StatusCode != 200)
+                if (serviceResponse.StatusCode != 201)
                 {
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }

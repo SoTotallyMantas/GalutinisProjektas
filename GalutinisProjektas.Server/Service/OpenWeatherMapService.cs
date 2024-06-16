@@ -1,5 +1,5 @@
-﻿using GalutinisProjektas.Server.Models;
-using GalutinisProjektas.Server.Models.AirPollutionResponse;
+﻿using GalutinisProjektas.Server.Models.AirPollutionResponse;
+using GalutinisProjektas.Server.Models.UtilityModels;
 using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service

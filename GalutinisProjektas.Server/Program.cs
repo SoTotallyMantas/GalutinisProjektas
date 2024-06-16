@@ -1,5 +1,7 @@
+using GalutinisProjektas.Server.Entity;
 using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Service;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Reflection;
 
@@ -13,10 +15,18 @@ builder.Services.AddHttpClient();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddControllers();
+
+builder.Services.AddDbContextPool<ModeldbContext>(options =>
+    options.UseMySQL(connectionString: builder.Configuration.GetConnectionString("DefaultConnection"))
+ .EnableSensitiveDataLogging()  // Enable to log parameter values
+               .LogTo(Console.WriteLine, LogLevel.Information));  // Log SQL statements to console
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
-  options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
   {
     Title = "GalutinisProjektas",
     Version = "v1",
@@ -36,8 +46,13 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSingleton<OpenWeatherMapService>();
 // Add CarbonInterface service
 builder.Services.AddSingleton<CarbonInterfaceService>();
+// Add CountryCodes service
+builder.Services.AddScoped<CountryCodesService>();
+// Add IATACodes service
+builder.Services.AddScoped<IATACodesService>();
+// Add FuelTypes service
+builder.Services.AddScoped<FuelTypesService>();
 var app = builder.Build();
-
 app.UseDefaultFiles();
 app.UseStaticFiles();
 

@@ -6,8 +6,7 @@ namespace GalutinisProjektas.Server.Models.ElectricityResponse
     {
         [JsonPropertyName("country")]
         public string Country { get; set; }
-        [JsonPropertyName("state")]
-        public string? State { get; set; }
+        
         [JsonPropertyName("electricity_unit")]
         public string ElectricityUnit { get; set; }
         [JsonPropertyName("electricity_value")]

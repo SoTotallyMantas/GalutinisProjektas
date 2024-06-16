@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using GalutinisProjektas.Server.Models.UtilityModels;
 
 namespace GalutinisProjektas.Server.Models.FlightResponse
 {

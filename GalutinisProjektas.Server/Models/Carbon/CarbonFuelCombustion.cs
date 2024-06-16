@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace GalutinisProjektas.Server.Models.Carbon
@@ -10,11 +11,13 @@ namespace GalutinisProjektas.Server.Models.Carbon
         [ValidateNever]
         public required string type { get; set; }
         [Required]
+        [SwaggerSchema("The fuel source type")]
         public required string fuel_source_type { get; set; }
         [Required]
-
+        [SwaggerSchema("The fuel source unit")]
         public required string fuel_source_unit { get; set; }
-
+        [Required]
+        [SwaggerSchema("The fuel source value")]
         public decimal fuel_source_value { get; set; }
 
     }

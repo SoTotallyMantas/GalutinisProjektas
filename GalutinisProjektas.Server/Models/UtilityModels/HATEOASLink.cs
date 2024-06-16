@@ -1,4 +1,4 @@
-﻿namespace GalutinisProjektas.Server.Models
+﻿namespace GalutinisProjektas.Server.Models.UtilityModels
 {
     public class HATEOASLink
     {
@@ -6,6 +6,6 @@
 
         public required string Rel { get; set; }
         public required string Method { get; set; }
-        
+
     }
 }
