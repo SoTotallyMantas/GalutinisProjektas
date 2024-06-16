@@ -8,8 +8,8 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 
-
-
+// Adding Memory Cache
+builder.Services.AddMemoryCache();
 // Configure HttpClient
 builder.Services.AddHttpClient();
 

@@ -10,6 +10,7 @@ using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Models.HATEOASResourceModels;
 using GalutinisProjektas.Server.Service;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace GalutinisProjektas.Server.Controllers
 {
@@ -18,10 +19,13 @@ namespace GalutinisProjektas.Server.Controllers
     public class IATACodesController : ControllerBase
     {
         private readonly IATACodesService _iataCodesService;
+        private readonly IMemoryCache _memoryCache;
+        private static readonly string IATAcacheKey = "IATACodes";
 
-        public IATACodesController(IATACodesService iATACodesService)
+        public IATACodesController(IATACodesService iATACodesService, IMemoryCache memoryCache)
         {
             _iataCodesService = iATACodesService;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -34,13 +38,23 @@ namespace GalutinisProjektas.Server.Controllers
 
            try
             {
-                var iataCodes = await _iataCodesService.GetIATACodesAsync();
-                if (iataCodes == null)
+                if (!_memoryCache.TryGetValue(IATAcacheKey, out IEnumerable<IATACodes> cacheEntry))
                 {
-                    return NotFound();
+                    var iataCodes = await _iataCodesService.GetIATACodesAsync();
+                    if (iataCodes == null)
+                    {
+                        return NotFound();
+                    }
+                     cacheEntry = iataCodes.Select(x => IATACodesResponse("GET", x)).ToList();
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(IATAcacheKey, cacheEntry, cacheEntryOptions);
+
                 }
-                var response = iataCodes.Select(x => IATACodesResponse("GET", x)).ToList();
-                return Ok(response);
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {
@@ -58,14 +72,23 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var iATACodes = await _iataCodesService.GetIATACodeByIdAsync(id);
-
-                if (iATACodes == null)
+                var cacheKey = $"{IATAcacheKey}{id}";
+                if (!_memoryCache.TryGetValue(cacheKey, out IATACodesResponse cacheEntry))
                 {
-                    return NotFound();
+                    var iataCode = await _iataCodesService.GetIATACodeByIdAsync(id);
+                    if (iataCode == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = IATACodesResponse("GETID", iataCode);
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
                 }
-                var response = IATACodesResponse("GETID", iATACodes);
-                return Ok(response);
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {
@@ -82,15 +105,24 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var iATACodes = await _iataCodesService.GetIATACodeByCodeAsync(IATA);
-
-                if (iATACodes == null)
+                var cacheKey = $"{IATAcacheKey}{IATA}";
+                if (!_memoryCache.TryGetValue(cacheKey, out IATACodesResponse cacheEntry))
                 {
-                    return NotFound();
-                }
-                var response = IATACodesResponse("GETBYIATA", iATACodes);
+                    var iataCode = await _iataCodesService.GetIATACodeByCodeAsync(IATA);
+                    if (iataCode == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = IATACodesResponse("GETBYIATA", iataCode);
 
-                return Ok(response);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
+                }
+
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {

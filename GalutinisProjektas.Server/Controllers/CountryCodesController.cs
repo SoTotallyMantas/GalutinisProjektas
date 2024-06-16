@@ -10,6 +10,8 @@ using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Models.HATEOASResourceModels;
 using GalutinisProjektas.Server.Service;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Caching.Memory;
+using Azure;
 
 namespace GalutinisProjektas.Server.Controllers
 {
@@ -17,13 +19,14 @@ namespace GalutinisProjektas.Server.Controllers
     [ApiController]
     public class CountryCodesController : ControllerBase
     {
-        private readonly ModeldbContext _context;
+        
         private readonly CountryCodesService _countryCodesService;
-
-        public CountryCodesController(ModeldbContext context, CountryCodesService countryCodesService)
+        private readonly IMemoryCache _memoryCache;
+        private static readonly string CountryCodesCacheKey = "CountryCodes";
+        public CountryCodesController(CountryCodesService countryCodesService,IMemoryCache memoryCache)
         {
-            _context = context;
             _countryCodesService = countryCodesService;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -35,9 +38,23 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-               var CountryCodes = await _countryCodesService.GetAllCountryCodesAsync();
-                var response = CountryCodes.Select(x => CountryCodeResponse("GET", x)).ToList();
-                return Ok(response);
+                if (!_memoryCache.TryGetValue(CountryCodesCacheKey, out IEnumerable<CountryCodes> cacheEntry))
+                {
+                    var countryCodes = await _countryCodesService.GetAllCountryCodesAsync();
+                    if (countryCodes.Count() == 0)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = countryCodes.Select(x => CountryCodeResponse("GET", x)).ToList();
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(CountryCodesCacheKey, cacheEntry, cacheEntryOptions);
+                }
+               
+                return Ok(cacheEntry);
             }
             catch (Exception ex)
             {
@@ -55,15 +72,25 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var countryCodes = await _countryCodesService.GetCountryCodeByIdAsync(id);
-
-                if (countryCodes == null)
+                string cacheKey = $"{CountryCodesCacheKey}{id}";
+                if (!_memoryCache.TryGetValue(cacheKey, out CountryCodes cacheEntry))
                 {
-                    return NotFound();
-                }
-                var response = CountryCodeResponse("GETID", countryCodes);
+                    var countryCodes = await _countryCodesService.GetCountryCodeByIdAsync(id);
 
-                return Ok(response);
+                    if (countryCodes == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = countryCodes;
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
+                }
+               
+
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {
@@ -83,15 +110,28 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var countryCodes = await _countryCodesService.GetCountryCodeByCountryNameAsync(CountryName);
-
-                if (countryCodes == null)
+                string cacheKey = $"{CountryCodesCacheKey}{CountryName}";
+                if(!_memoryCache.TryGetValue(cacheKey, out CountryCodes cacheEntry))
                 {
-                    return NotFound();
-                }
-                var response = CountryCodeResponse("GETBYNAME", countryCodes);
 
-                return Ok(response);
+                    var countryCodes = await _countryCodesService.GetCountryCodeByCountryNameAsync(CountryName);
+
+                    if (countryCodes == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = CountryCodeResponse("GETBYNAME", countryCodes);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                     _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
+
+                }
+                return Ok(cacheEntry);
+
+
+
             }
             catch (Exception)
             {

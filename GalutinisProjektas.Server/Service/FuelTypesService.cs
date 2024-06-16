@@ -8,6 +8,7 @@ namespace GalutinisProjektas.Server.Service
     {
         private readonly ModeldbContext _context;
 
+
         public FuelTypesService(ModeldbContext context)
         {
             _context = context;

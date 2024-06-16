@@ -10,6 +10,7 @@ using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Service;
 using GalutinisProjektas.Server.Models.HATEOASResourceModels;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace GalutinisProjektas.Server.Controllers
 {
@@ -18,10 +19,13 @@ namespace GalutinisProjektas.Server.Controllers
     public class FuelTypesController : ControllerBase
     {
         private readonly FuelTypesService _fuelTypesService;
+        private readonly IMemoryCache _memoryCache;
+        private static readonly string FuelTypesCacheKey = "FuelTypes";
 
-        public FuelTypesController(FuelTypesService fuelTypesService)
+        public FuelTypesController(FuelTypesService fuelTypesService, IMemoryCache memoryCache)
         {
             _fuelTypesService = fuelTypesService;
+            _memoryCache = memoryCache;
         }
 
         /// <summary>
@@ -33,14 +37,25 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var fuelTypes = await _fuelTypesService.GetFuelTypesAsync();
-                if (fuelTypes == null)
+                if(!_memoryCache.TryGetValue(FuelTypesCacheKey, out IEnumerable<FuelTypes> cacheEntry))
                 {
-                    return NotFound();
-                }
+                    var fuelTypes = await _fuelTypesService.GetFuelTypesAsync();
+                    if (fuelTypes.Count() == 0)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = fuelTypes.Select(x => FuelTypesResponse("GET", x)).ToList();
 
-                var response = fuelTypes.Select(x => FuelTypesResponse("GET", x)).ToList();
-                return Ok(response);
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(FuelTypesCacheKey, cacheEntry, cacheEntryOptions);
+                }
+               
+
+               
+                return Ok(cacheEntry);
 
             }
             catch (Exception)
@@ -60,14 +75,25 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var fuelTypes = await _fuelTypesService.GetFuelTypeByIdAsync(id);
-
-                if (fuelTypes == null)
+                string cacheKey = $"{FuelTypesCacheKey}{id}";
+                if (!_memoryCache.TryGetValue(cacheKey, out FuelTypesResponse cacheEntry))
                 {
-                    return NotFound();
+                    var fuelTypes = await _fuelTypesService.GetFuelTypeByIdAsync(id);
+
+                    if (fuelTypes == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = FuelTypesResponse("GETID", fuelTypes);
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
                 }
-                var response = FuelTypesResponse("GETID", fuelTypes);
-                return Ok(response);
+               
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {
@@ -85,14 +111,24 @@ namespace GalutinisProjektas.Server.Controllers
         {
             try
             {
-                var fuelTypes = await _fuelTypesService.GetFuelTypeByNameAsync(FuelType);
+                string cacheKey = $"{FuelTypesCacheKey}{FuelType}";
+                if (!_memoryCache.TryGetValue(cacheKey, out IEnumerable<FuelTypes> cacheEntry))
+                    {
+                    var fuelTypes = await _fuelTypesService.GetFuelTypeByNameAsync(FuelType);
 
-                if (fuelTypes == null)
-                {
-                    return NotFound();
+                    if (fuelTypes.Count() == 0)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = fuelTypes.Select(x => FuelTypesResponse("GETBYTYPE", x)).ToList();
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
                 }
-                var response = fuelTypes.Select(x => FuelTypesResponse("GETBYTYPE", x)).ToList();
-                return Ok(response);
+                return Ok(cacheEntry);
             }
             catch (Exception)
             {
