@@ -14,6 +14,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GalutinisProjektas.Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling requests related to IATA codes.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class IATACodesController : ControllerBase
@@ -22,6 +25,11 @@ namespace GalutinisProjektas.Server.Controllers
         private readonly IMemoryCache _memoryCache;
         private static readonly string IATAcacheKey = "IATACodes";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IATACodesController"/> class.
+        /// </summary>
+        /// <param name="iATACodesService">Service instance for handling IATA codes operations.</param>
+        /// <param name="memoryCache">Memory cache instance for caching IATA codes.</param>
         public IATACodesController(IATACodesService iATACodesService, IMemoryCache memoryCache)
         {
             _iataCodesService = iATACodesService;
@@ -29,9 +37,12 @@ namespace GalutinisProjektas.Server.Controllers
         }
 
         /// <summary>
-        ///  Get all IATA Codes
+        /// Retrieves all IATA codes.
         /// </summary>
-        /// <returns>All Country Codes</returns>
+        /// <returns>All IATA codes.</returns>
+        /// <response code="200">Returns the list of all IATA codes.</response>
+        /// <response code="404">If no IATA codes are found.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IATACodes>>> GetIATACodes()
         {
@@ -65,8 +76,11 @@ namespace GalutinisProjektas.Server.Controllers
         /// <summary>
         ///  Get IATA Code by ID
         /// </summary>
-        /// <param name="id"></param> IATA Codes ID
-        /// <returns>Returns IATA Code By ID</returns> 
+        /// <param name="id">IATA code ID.</param>
+        /// <returns>IATA code by ID.</returns>
+        /// <response code="200">Returns the IATA code for the specified ID.</response>
+        /// <response code="404">If no IATA code is found for the specified ID.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<IATACodes>> GetIATACodes([Required]  int id)
         {
@@ -95,11 +109,15 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server Error");
             }
         }
+        
         /// <summary>
         /// Get IATA Code Information by IATA code
         /// </summary>
-        /// <param name="IATA"></param> IATA Code
-        /// <returns>Returns IATA Code information</returns>
+        /// <param name="IATA">IATA code.</param>
+        /// <returns>IATA code information.</returns>
+        /// <response code="200">Returns the IATA code information for the specified IATA code.</response>
+        /// <response code="404">If no IATA code is found for the specified IATA code.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("GetByIATA/{IATA}")]
         public async Task<ActionResult<IATACodes>> GetByIATA( [Required] string IATA)
         {
@@ -129,6 +147,13 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server Error");
             }
         }
+
+        /// <summary>
+        /// Creates an IATACodesResponse object with HATEOAS links.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="iataCodes">IATA codes entity.</param>
+        /// <returns>Returns an IATACodesResponse object.</returns>
         private IATACodesResponse IATACodesResponse(string method, IATACodes iataCodes)
         {
             var iataCodesResponse = new IATACodesResponse
@@ -143,6 +168,13 @@ namespace GalutinisProjektas.Server.Controllers
 
             return iataCodesResponse;
         }
+
+        /// <summary>
+        /// Generates HATEOAS links for an IATACodes entity.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="iataCodes">IATA codes entity.</param>
+        /// <returns>Returns a list of HATEOAS links.</returns>
         private List<HATEOASLink> HATEOASLinks(string method, IATACodes iataCodes)
         {
             var links = new List<HATEOASLink>
