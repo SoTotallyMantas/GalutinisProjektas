@@ -1,56 +1,85 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FixedSizeList as List } from 'react-window';
 import './Emission.css';
+import { FixedSizeList as List } from 'react-window';
+import './List.css';
 import ComboBox from './ComboBox';
 
 const ElectricityEmission = () => {
-    const [selectedRow, setSelectedRow] = useState(null);
+    const options = [
+        { label: 'megawatt hours (mwh)', value: 'mwh' },
+        { label: 'kilowatt hours (kwh)', value: 'kwh' },
+    ];
+
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [countryFilter, setCountryFilter] = useState('');
-    const [unit, setUnit] = useState('');
-    const [value, setValue] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState(null);
+    const [electricityUnit, setElectricityUnit] = useState(options[0].value);
+    const [electricityValue, setElectricityValue] = useState('');
     const [emissionResult, setEmissionResult] = useState(null);
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
-    async function fetchIATACodes() {
+    async function fetchCountryCodes() {
         try {
-            const response = await fetch('/IATACodes');
+            const response = await fetch('/CountryCodes');
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const result = await response.json();
-            console.log('Fetched IATA Codes:', result); // Debug log
             const transformedData = result.map(item => ({
                 id: item.id,
-                IATACode: item.iata,
-                city: item.city,
-                airportName: item.airportName,
-                country: item.country
+                countryCode: item.countryCode,
+                countryName: item.countryName
             }));
             setData(transformedData);
             setFilteredData(transformedData);
         } catch (error) {
-            console.error('Error fetching IATA codes:', error);
+            console.error('Error fetching country codes:', error);
         }
     }
 
     useEffect(() => {
-        fetchIATACodes();
+        fetchCountryCodes();
     }, []);
 
     useEffect(() => {
         const filtered = data.filter(item =>
-            item.country.toLowerCase().includes(countryFilter.toLowerCase())
+            item.countryName.toLowerCase().includes(countryFilter.toLowerCase()) ||
+            item.countryCode.toLowerCase().includes(countryFilter.toLowerCase())
         );
-        console.log('Filtered Data:', filtered); // Debug log
         setFilteredData(filtered);
     }, [countryFilter, data]);
 
-    const handleRowClicked = (row) => {
-        setSelectedRow(row);
-        setSelectedCountry(row.country);
-        console.log('Selected Country:', row.country); // Debug log
+    const fetchEmissionData = async () => {
+        if (!selectedCountry) {
+            setError("Please select a country.");
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(`/CarbonInterface/Electricity?electricity_unit=${electricityUnit}&electricity_value=${electricityValue}&country=${selectedCountry.countryCode}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const result = await response.json();
+            setEmissionResult(result.data);
+        } catch (error) {
+            setError(error.toString());
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRowClick = (country) => {
+        setSelectedCountry(country);
     };
 
     const Row = useCallback(({ index, style }) => {
@@ -59,49 +88,17 @@ const ElectricityEmission = () => {
             <div
                 style={{
                     ...style,
-                    backgroundColor: selectedRow && selectedRow.id === row.id ? '#f1f1f1' : 'white',
-                    cursor: 'pointer',
-                    display: 'flex'
+                    backgroundColor: selectedCountry && selectedCountry.id === row.id ? 'lightgray' : 'white',
+                    display: 'flex',
+                    cursor: 'pointer'
                 }}
-                onClick={() => handleRowClicked(row)}
+                onClick={() => handleRowClick(row)}
             >
-                <div style={{ flex: 1, padding: '10px' }}>{row.IATACode}</div>
-                <div style={{ flex: 1, padding: '10px' }}>{row.city}</div>
-                <div style={{ flex: 1, padding: '10px' }}>{row.airportName}</div>
-                <div style={{ flex: 1, padding: '10px' }}>{row.country}</div>
+                <div style={{ flex: 1, padding: '10px' }}>{row.countryCode}</div>
+                <div style={{ flex: 1, padding: '10px' }}>{row.countryName}</div>
             </div>
         );
-    }, [filteredData, selectedRow]);
-
-    const options = [
-        { label: 'megawatt hours (mwh)', value: 'mwh' },
-        { label: 'kilowatt hours (kmh)', value: 'kmh' },
-    ];
-
-    const handleGetResult = async () => {
-        if (!selectedCountry || !unit || !value) {
-            alert('Please select a country, unit, and enter a value.');
-            console.log('Missing Parameters:', { selectedCountry, unit, value }); // Debug log
-            return;
-        }
-
-        console.log('Request Parameters:', {
-            unit,
-            value,
-            country: selectedCountry
-        }); // Debug log
-
-        try {
-            const response = await fetch(`/CarbonInterface/Electricity?electricity_unit=${unit}&electricity_value=${value}&country=${selectedCountry}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const result = await response.json();
-            setEmissionResult(result);
-        } catch (error) {
-            console.error('Error fetching emission data:', error);
-        }
-    };
+    }, [filteredData, selectedCountry]);
 
     return (
         <div className="container">
@@ -112,17 +109,15 @@ const ElectricityEmission = () => {
                 <ComboBox
                     label="Unit:"
                     options={options}
-                    onChange={(e) => {
-                        setUnit(e.target.value);
-                        console.log('Selected Unit:', e.target.value); // Debug log
-                    }}
+                    value={electricityUnit}
+                    onChange={(e) => setElectricityUnit(e.target.value)}
                 />
                 <div className="input-group">
                     <label>Value:</label>
                     <input
-                        type="text"
-                        value={value}
-                        onChange={(e) => setValue(e.target.value)}
+                        type="number"
+                        value={electricityValue}
+                        onChange={(e) => setElectricityValue(e.target.value)}
                     />
                 </div>
                 <div className="input-group">
@@ -136,36 +131,38 @@ const ElectricityEmission = () => {
                 <div className="data-table-container">
                     <div className="table-header">
                         <div className="table-row">
-                            <div className="table-cell">IATA Code</div>
-                            <div className="table-cell">City</div>
-                            <div className="table-cell">Airport Name</div>
-                            <div className="table-cell">Country</div>
+                            <div className="table-cell">Country Code</div>
+                            <div className="table-cell">Country Name</div>
                         </div>
                     </div>
-                    {filteredData.length > 0 ? (
-                        <List
-                            height={350}
-                            itemCount={filteredData.length}
-                            itemSize={35}
-                            width={'100%'}
-                        >
-                            {Row}
-                        </List>
-                    ) : (
-                        <div style={{ padding: '10px', textAlign: 'center' }}>No data available</div>
-                    )}
+                    <List
+                        height={350}
+                        itemCount={filteredData.length}
+                        itemSize={35}
+                        width={'100%'}
+                    >
+                        {Row}
+                    </List>
                 </div>
                 <div className="button-group">
-                    <button onClick={handleGetResult}>Get result</button>
+                    <button onClick={fetchEmissionData}>Get result</button>
                 </div>
             </div>
             <div className="right-section">
                 <p>Emission Result</p>
-                <div className="big-box">
-                    {emissionResult && (
-                        <pre>{JSON.stringify(emissionResult, null, 2)}</pre>
-                    )}
-                </div>
+                {loading && <p>Loading...</p>}
+                {error && <p>{error}</p>}
+                {emissionResult && (
+                    <div className="list-item">
+                        <div>Country: {emissionResult.attributes.country}</div>
+                        <div>Electricity Unit: {emissionResult.attributes.electricity_unit}</div>
+                        <div>Electricity Value: {emissionResult.attributes.electricity_value}</div>
+                        <div>Carbon (g): {emissionResult.attributes.carbon_g}</div>
+                        <div>Carbon (lb): {emissionResult.attributes.carbon_lb}</div>
+                        <div>Carbon (kg): {emissionResult.attributes.carbon_kg}</div>
+                        <div>Carbon (mt): {emissionResult.attributes.carbon_mt}</div>
+                    </div>
+                )}
             </div>
         </div>
     );
