@@ -15,6 +15,9 @@ using Azure;
 
 namespace GalutinisProjektas.Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling requests related to country codes.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class CountryCodesController : ControllerBase
@@ -23,6 +26,12 @@ namespace GalutinisProjektas.Server.Controllers
         private readonly CountryCodesService _countryCodesService;
         private readonly IMemoryCache _memoryCache;
         private static readonly string CountryCodesCacheKey = "CountryCodes";
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CountryCodesController"/> class.
+        /// </summary>
+        /// <param name="countryCodesService">Service instance for handling country codes operations.</param>
+        /// <param name="memoryCache">Memory cache instance for caching country codes.</param>
         public CountryCodesController(CountryCodesService countryCodesService,IMemoryCache memoryCache)
         {
             _countryCodesService = countryCodesService;
@@ -30,8 +39,11 @@ namespace GalutinisProjektas.Server.Controllers
         }
 
         /// <summary>
-        /// Retrieves all country codes
+        /// Retrieves all country codes.
         /// </summary>
+        /// <response code="200">Returns the list of all country codes.</response>
+        /// <response code="404">If no country codes are found.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         /// <returns>All Country Codes</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CountryCodeResponse>>> GetCountryCodes()
@@ -62,11 +74,14 @@ namespace GalutinisProjektas.Server.Controllers
             }
         }
 
-        /// <summary>
-        /// Retrieves Country Codes by ID
+         /// <summary>
+        /// Retrieves country code by ID.
         /// </summary>
-        /// <param name="id"></param> Country Codes ID
-        /// <returns>Returns Country Code By ID</returns>
+        /// <param name="id">Country code ID.</param>
+        /// <returns>Returns country code by ID.</returns>
+        /// <response code="200">Returns the country code for the specified ID.</response>
+        /// <response code="404">If no country code is found for the specified ID.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<CountryCodeResponse>> GetCountryCodes( [Required] int id)
         {
@@ -99,12 +114,14 @@ namespace GalutinisProjektas.Server.Controllers
         }
         
         /// <summary>
-        ///  Retrieves Country Codes by Country Name
+        /// Retrieves country code by country name.
         /// </summary> 
-        /// <param name="CountryName"></param> Country Name
-        /// <remarks>Queries the database for the country code based on the specified country name</remarks>
-        /// <returns>Country Code</returns>
-
+        /// <param name="CountryName">Country name.</param>
+        /// <remarks>Queries the database for the country code based on the specified country name.</remarks>
+        /// <returns>Country code for the specified country name.</returns>
+        /// <response code="200">Returns the country code for the specified country name.</response>
+        /// <response code="404">If no country code is found for the specified country name.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("GetByName/{CountryName}")]
         public async Task<ActionResult<CountryCodeResponse>> GetByCountryName([Required] string CountryName)
         {
@@ -138,6 +155,13 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
         }
+        
+        /// <summary>
+        /// Creates a CountryCodeResponse object with HATEOAS links.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="countryCodes">Country codes entity.</param>
+        /// <returns>Returns a CountryCodeResponse object.</returns>
         private CountryCodeResponse CountryCodeResponse(string method, CountryCodes countryCodes)
         {
             var countryCodeResponse = new CountryCodeResponse
@@ -150,6 +174,13 @@ namespace GalutinisProjektas.Server.Controllers
             
             return countryCodeResponse;
         }
+        
+        /// <summary>
+        /// Generates HATEOAS links for a CountryCodes entity.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="countryCodes">Country codes entity.</param>
+        /// <returns>Returns a list of HATEOAS links.</returns>
         private List<HATEOASLink> HATEOASLinks(string method,CountryCodes countryCodes) {
             var links = new List<HATEOASLink>
             {
