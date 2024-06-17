@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using NUnit.Framework;
@@ -11,7 +12,6 @@ using GalutinisProjektas.Server.Entity;
 using GalutinisProjektas.Server.Models.HATEOASResourceModels;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Service;
-using Microsoft.EntityFrameworkCore;
 
 namespace ReqNrollTests.StepDefinitions
 {
@@ -19,41 +19,45 @@ namespace ReqNrollTests.StepDefinitions
     [Binding]
     public class IATACodesControllerStepDefinitions
     {
-        private Mock<DbSet<IATACodes>> _dbSetMock;
-        private Mock<ModeldbContext> _dbContextMock;
+        private DbContextOptions<ModeldbContext> _dbContextOptions;
+        private ModeldbContext _dbContext;
         private IATACodesService _service;
         private Mock<IMemoryCache> _memoryCacheMock;
         private IATACodesController _controller;
-        private ActionResult<IEnumerable<IATACodesResponse>> _listResult;
+        private ActionResult<IEnumerable<IATACodes>> _listResult;
         private ActionResult<IATACodesResponse> _singleResult;
 
-        public IATACodesControllerStepDefinitions()
+        private void SetupInMemoryDatabase()
         {
-            _dbSetMock = new Mock<DbSet<IATACodes>>();
-            _dbContextMock = new Mock<ModeldbContext>();
-            _service = new IATACodesService(_dbContextMock.Object);
+            _dbContextOptions = new DbContextOptionsBuilder<ModeldbContext>()
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
+                .Options;
+
+            _dbContext = new ModeldbContext(_dbContextOptions);
             _memoryCacheMock = new Mock<IMemoryCache>();
+
+            _service = new IATACodesService(_dbContext);
             _controller = new IATACodesController(_service, _memoryCacheMock.Object);
             _listResult = null;
             _singleResult = null;
+
+            _dbContext.Database.EnsureCreated();
+            SeedDatabase();
         }
 
-        [SetUp]
-        public void Setup()
+        private void SeedDatabase()
         {
-            _dbSetMock = new Mock<DbSet<IATACodes>>();
-            _dbContextMock = new Mock<ModeldbContext>();
-            _service = new IATACodesService(_dbContextMock.Object);
-            _memoryCacheMock = new Mock<IMemoryCache>();
-            _controller = new IATACodesController(_service, _memoryCacheMock.Object);
-            _listResult = null;
-            _singleResult = null;
+            _dbContext.IATACodes.AddRange(
+                new IATACodes { Id = 1, IATA = "LAX", City = "Los Angeles", Country = "USA", AirportName = "Los Angeles International Airport" },
+                new IATACodes { Id = 2, IATA = "JFK", City = "New York", Country = "USA", AirportName = "John F. Kennedy International Airport" }
+            );
+            _dbContext.SaveChanges();
         }
 
         [Given("the IATA codes service is available")]
         public void GivenTheIATACodesServiceIsAvailable()
         {
-            // Setup or initialization if needed
+            SetupInMemoryDatabase();
         }
 
         [When("I request all IATA codes")]
@@ -66,9 +70,9 @@ namespace ReqNrollTests.StepDefinitions
         public void ThenTheResponseShouldBeSuccessfulAndContainTheIATACodes()
         {
             Assert.IsNotNull(_listResult);
-            Assert.IsInstanceOf<OkObjectResult>(_listResult.Result);
+            Assert.IsInstanceOf<ObjectResult>(_listResult.Result);
 
-            var okResult = _listResult.Result as OkObjectResult;
+            var okResult = _listResult.Result as ObjectResult;
             var iataCodes = okResult?.Value as IEnumerable<IATACodesResponse>;
 
             Assert.IsNotNull(iataCodes);
@@ -78,24 +82,13 @@ namespace ReqNrollTests.StepDefinitions
         [Given("the IATA code with ID {int} is available in the service")]
         public void GivenTheIATACodeWithIDIsAvailableInTheService(int id)
         {
-            var iataCode = new IATACodes
-            {
-                Id = id,
-                IATA = "LAX",
-                City = "Los Angeles",
-                Country = "USA",
-                AirportName = "Los Angeles International Airport"
-            };
-
-            _dbSetMock.Setup(m => m.FindAsync(id)).ReturnsAsync(iataCode);
-            _dbContextMock.Setup(c => c.IATACodes).Returns(_dbSetMock.Object);
+            // No need to set up as it is already seeded in the database
         }
 
         [When("I request the IATA code by ID {int}")]
         public async Task WhenIRequestTheIATACodeByID(int id)
         {
-            var actionResult = await _controller.GetIATACodes(id);
-            _singleResult = ConvertToIATACodesResponse(actionResult);
+            _singleResult = await ConvertToIATACodesResponse(_controller.GetIATACodes(id));
         }
 
         [Then("the response should be successful and contain the IATA code")]
@@ -114,24 +107,13 @@ namespace ReqNrollTests.StepDefinitions
         [Given("the IATA code with code {string} is available in the service")]
         public void GivenTheIATACodeWithCodeIsAvailableInTheService(string code)
         {
-            var iataCode = new IATACodes
-            {
-                Id = 1,
-                IATA = code,
-                City = "Los Angeles",
-                Country = "USA",
-                AirportName = "Los Angeles International Airport"
-            };
+            // No need to set up as it is already seeded in the database
+        }
 
-            _dbSetMock.Setup(m => m.FirstOrDefaultAsync(It.IsAny<Func<IATACodes, bool>>())).ReturnsAsync(iataCode);
-            _dbContextMock.Setup(c => c.IATACodes).Returns(_dbSetMock.Object);
-        }   
-        //nnn
         [When("I request the IATACode by code {string}")]
         public async Task WhenIRequestTheIATACodeByCode(string code)
         {
-            var actionResult = await _controller.GetByIATA(code);
-            _singleResult = ConvertToIATACodesResponse(actionResult);
+            _singleResult = await ConvertToIATACodesResponse(_controller.GetByIATA(code));
         }
 
         [Then("the response should be successful and contain the IATACode by code")]
@@ -147,21 +129,12 @@ namespace ReqNrollTests.StepDefinitions
             Assert.AreEqual("LAX", iataCode.IATA);
         }
 
-        // Helper method for setting up the memory cache mock
-        private static IMemoryCache SetupMemoryCacheMock()
+        // Consolidated helper method to convert ActionResult to ActionResult<IATACodesResponse>
+        private async Task<ActionResult<IATACodesResponse>> ConvertToIATACodesResponse(Task<ActionResult<IATACodes>> task)
         {
-            var memoryCacheMock = new Mock<IMemoryCache>();
-            var cacheEntryMock = new Mock<ICacheEntry>();
-            memoryCacheMock.Setup(mc => mc.CreateEntry(It.IsAny<object>())).Returns(cacheEntryMock.Object);
-            return memoryCacheMock.Object;
-        }
-
-        // Helper method to convert ActionResult<IATACodes> to ActionResult<IATACodesResponse>
-        private ActionResult<IATACodesResponse> ConvertToIATACodesResponse(ActionResult<IATACodes> actionResult)
-        {
-            if (actionResult.Result is OkObjectResult okResult)
+            var actionResult = await task;
+            if (actionResult.Result is OkObjectResult okResult && okResult.Value is IATACodes iataCode)
             {
-                var iataCode = okResult.Value as IATACodes;
                 var iataCodeResponse = new IATACodesResponse
                 {
                     Id = iataCode.Id,
@@ -175,7 +148,7 @@ namespace ReqNrollTests.StepDefinitions
                 return new OkObjectResult(iataCodeResponse);
             }
 
-            return new ActionResult<IATACodesResponse>(actionResult.Result);
+            return actionResult.Result != null ? new ActionResult<IATACodesResponse>(actionResult.Result) : null;
         }
     }
 }
