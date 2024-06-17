@@ -48,7 +48,6 @@ namespace GalutinisProjektas.Server.Controllers
         [HttpPost(Name = RouteName)]
         [ProducesResponseType(typeof(AirPollutionResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        
         public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
         {
             try
