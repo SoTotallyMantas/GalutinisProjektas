@@ -20,22 +20,22 @@ namespace ReqNrollTests.Features
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Reqnroll", "2.0.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     [NUnit.Framework.TestFixtureAttribute()]
-    [NUnit.Framework.DescriptionAttribute("IATA Codes Management")]
-    public partial class IATACodesManagementFeature
+    [NUnit.Framework.DescriptionAttribute("IATACodesController")]
+    public partial class IATACodesControllerFeature
     {
         
         private global::Reqnroll.ITestRunner testRunner;
         
         private static string[] featureTags = ((string[])(null));
         
-#line 1 "IATACodes.feature"
+#line 1 "IATACodesController.feature"
 #line hidden
         
         [NUnit.Framework.OneTimeSetUpAttribute()]
         public virtual async System.Threading.Tasks.Task FeatureSetupAsync()
         {
             testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, NUnit.Framework.TestContext.CurrentContext.WorkerId);
-            global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IATA Codes Management", null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
+            global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "IATACodesController", null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
             await testRunner.OnFeatureStartAsync(featureInfo);
         }
         
@@ -80,7 +80,7 @@ namespace ReqNrollTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieve all IATA codes", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 2
+#line 3
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -90,13 +90,13 @@ namespace ReqNrollTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 3
+#line 4
     await testRunner.GivenAsync("the IATA codes service is available", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 4
+#line 5
     await testRunner.WhenAsync("I request all IATA codes", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 5
+#line 6
     await testRunner.ThenAsync("the response should be successful and contain the IATA codes", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -110,7 +110,7 @@ namespace ReqNrollTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieve IATA code by ID", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 7
+#line 8
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -120,13 +120,13 @@ namespace ReqNrollTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 8
+#line 9
     await testRunner.GivenAsync("the IATA code with ID 1 is available in the service", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 9
+#line 10
     await testRunner.WhenAsync("I request the IATA code by ID 1", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 10
+#line 11
     await testRunner.ThenAsync("the response should be successful and contain the IATA code", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }
@@ -140,7 +140,7 @@ namespace ReqNrollTests.Features
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             global::Reqnroll.ScenarioInfo scenarioInfo = new global::Reqnroll.ScenarioInfo("Retrieve IATA code by code", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 12
+#line 13
   this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags) || global::Reqnroll.TagHelper.ContainsIgnoreTag(featureTags)))
@@ -150,13 +150,13 @@ namespace ReqNrollTests.Features
             else
             {
                 await this.ScenarioStartAsync();
-#line 13
+#line 14
     await testRunner.GivenAsync("the IATA code with code \"LAX\" is available in the service", ((string)(null)), ((global::Reqnroll.Table)(null)), "Given ");
 #line hidden
-#line 14
+#line 15
     await testRunner.WhenAsync("I request the IATA code by code \"LAX\"", ((string)(null)), ((global::Reqnroll.Table)(null)), "When ");
 #line hidden
-#line 15
+#line 16
     await testRunner.ThenAsync("the response should be successful and contain the IATA code by code", ((string)(null)), ((global::Reqnroll.Table)(null)), "Then ");
 #line hidden
             }

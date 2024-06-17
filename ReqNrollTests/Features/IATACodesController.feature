@@ -1,4 +1,5 @@
-Feature: IATA Codes Management
+Feature: IATACodesController
+
   Scenario: Retrieve all IATA codes
     Given the IATA codes service is available
     When I request all IATA codes
