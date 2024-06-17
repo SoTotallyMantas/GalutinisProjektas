@@ -26,7 +26,6 @@ namespace GalutinisProjektas.Server.Controllers
         /// <summary>
         ///    Retrieves the carbon emissions estimate for electricity usage
         /// </summary>
-        /// 
         /// <param name="request"></param> CarbonElectricity object containing the electricity unit, value, country 
         /// <returns>Electricity carbon emissions Estimate</returns>
         /// <remarks>
