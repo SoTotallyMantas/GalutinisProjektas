@@ -9,7 +9,7 @@ const CarbonInterfacePage = () => {
     return (
         <div className="carbon-interface-page">
             <main>
-                <h1 className="title">CarbonInterface API</h1>
+                <h1>CarbonInterface API</h1>
                 <div className="emission-options">
                     <ApiCard
                         image={Plane}

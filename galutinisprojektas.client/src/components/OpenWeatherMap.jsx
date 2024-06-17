@@ -5,7 +5,7 @@ const OpenWeatherMap = () => {
     return (
         <div className="container">
             <div className="left-section">
-                <div className="title">OpenWeatherMap API</div>
+                <h1>OpenWeatherMap API</h1>
                 <div className="input-group">
                     <label>Latitude:</label>
                     <input type="text" />
@@ -21,7 +21,7 @@ const OpenWeatherMap = () => {
                 </div>
             </div>
             <div className="right-section">
-                <div className="result-title">Pollution Result</div>
+                <p>Pollution Result</p>
                 <div className="big-box"></div>
             </div>
         </div>

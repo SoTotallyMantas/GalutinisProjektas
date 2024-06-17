@@ -1,8 +1,6 @@
 .carbon-interface-page {
     position: relative;
     text-align: center;
-    min-height: 100vh;
-    min-width: 200vh;
     display: flex;
     background-color: #ecf0f1;
     flex-direction: column;

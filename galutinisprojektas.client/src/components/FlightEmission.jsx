@@ -12,7 +12,9 @@ const FlightEmission = () => {
     return (
         <div className="container">
             <div className="left-section">
-                <div className="title">Flight Emission</div>
+                <div>
+                    <h1>Flight Emission</h1>
+                </div>
                 <div className="input-group">
                     <label>Country:</label>
                     <input type="text" />
@@ -29,7 +31,7 @@ const FlightEmission = () => {
                 <div className="big-box"></div>
             </div>
             <div className="right-section">
-                <div className="flight-info-title">Flight information:</div>
+                <p>Flight information:</p>
                 <div className="big-box"></div>
                 <button className="result-button" onClick={goToFlightCombustionResult}>Get result</button>
             </div>

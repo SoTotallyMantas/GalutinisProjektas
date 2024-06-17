@@ -14,15 +14,6 @@
     border-radius: 10px;
 }
 
-.api-card h2 {
-    margin: 10px 0;
-}
-
-.api-card p {
-    color: #7f8c8d;
-    margin-bottom: 20px;
-}
-
 .api-card button {
     background-color: #3498db;
     color: white;
