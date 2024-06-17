@@ -4,6 +4,9 @@ using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
+    /// <summary>
+    /// Service class for interacting with the OpenWeatherMap API to retrieve air pollution data.
+    /// </summary>
     public class OpenWeatherMapService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenWeatherMapService> logger)
     {
         private readonly HttpClient _httpClient = httpClient;
@@ -12,7 +15,12 @@ namespace GalutinisProjektas.Server.Service
 #pragma warning restore CS8601 // Possible null reference assignment.
         private readonly ILogger<OpenWeatherMapService> _logger = logger;
 
-
+        /// <summary>
+        /// Retrieves air pollution data from the OpenWeatherMap API based on latitude and longitude.
+        /// </summary>
+        /// <param name="latitude">Latitude of the location.</param>
+        /// <param name="longitude">Longitude of the location.</param>
+        /// <returns>A ServiceResponse containing the air pollution data for the specified location.</returns>
         public async Task<ServiceResponse<AirPollutionResponse>> GetAirPollutionDataAsync(double latitude,double longtitude)
         {
 
