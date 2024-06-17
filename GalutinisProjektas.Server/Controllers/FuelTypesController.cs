@@ -14,6 +14,9 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GalutinisProjektas.Server.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling requests related to fuel types.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class FuelTypesController : ControllerBase
@@ -21,7 +24,12 @@ namespace GalutinisProjektas.Server.Controllers
         private readonly FuelTypesService _fuelTypesService;
         private readonly IMemoryCache _memoryCache;
         private static readonly string FuelTypesCacheKey = "FuelTypes";
-
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FuelTypesController"/> class.
+        /// </summary>
+        /// <param name="fuelTypesService">Service instance for handling fuel types operations.</param>
+        /// <param name="memoryCache">Memory cache instance for caching fuel types.</param>
         public FuelTypesController(FuelTypesService fuelTypesService, IMemoryCache memoryCache)
         {
             _fuelTypesService = fuelTypesService;
@@ -32,6 +40,9 @@ namespace GalutinisProjektas.Server.Controllers
         /// Get All Fuel Types
         /// </summary>
         /// <returns>Returns All Fuel Types</returns>
+        /// <response code="200">Returns the list of all fuel types.</response>
+        /// <response code="404">If no fuel types are found.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FuelTypes>>> GetFuelTypes()
         {
@@ -64,12 +75,15 @@ namespace GalutinisProjektas.Server.Controllers
             }
 
         }
+        
         /// <summary>
         /// Get Fuel Type by ID
         /// </summary>
-        /// <param name="id"></param> Fuel Type ID
-        /// <returns>Fuel Type by ID</returns>
-       
+        /// <param name="id">Fuel type ID.</param>
+        /// <returns>Fuel type by ID.</returns>
+        /// <response code="200">Returns the fuel type for the specified ID.</response>
+        /// <response code="404">If no fuel type is found for the specified ID.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("{id}")]
         public async Task<ActionResult<FuelTypes>> GetFuelTypes( [Required] int id)
         {
@@ -104,8 +118,11 @@ namespace GalutinisProjektas.Server.Controllers
         /// <summary>
         ///  Get Fuel Type Information by Fuel Type
         /// </summary>
-        /// <param name="FuelType"></param> Fuel Type
-        /// <returns>Returns Fuel Type information</returns>
+        /// <param name="FuelType">Fuel type name.</param>
+        /// <returns>Fuel type information.</returns>
+        /// <response code="200">Returns the fuel type information for the specified fuel type name.</response>
+        /// <response code="404">If no fuel type is found for the specified fuel type name.</response>
+        /// <response code="500">If an internal server error occurs.</response>
         [HttpGet("GetByFuelType/{FuelType}")]
         public async Task<ActionResult<FuelTypes>> GetByFuelType( [Required] string FuelType)
         {
@@ -135,6 +152,13 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server Error");
             }
         }
+
+        /// <summary>
+        /// Creates a FuelTypesResponse object with HATEOAS links.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="fuelTypes">Fuel types entity.</param>
+        /// <returns>Returns a FuelTypesResponse object.</returns>
         private FuelTypesResponse FuelTypesResponse(string method, FuelTypes fuelTypes)
         {
             var fuelTypesResponse = new FuelTypesResponse
@@ -148,6 +172,13 @@ namespace GalutinisProjektas.Server.Controllers
 
             return fuelTypesResponse;
         }
+
+        /// <summary>
+        /// Generates HATEOAS links for a FuelTypes entity.
+        /// </summary>
+        /// <param name="method">HTTP method.</param>
+        /// <param name="fuelTypes">Fuel types entity.</param>
+        /// <returns>Returns a list of HATEOAS links.</returns>
         private List<HATEOASLink> HATEOASLinks(string method, FuelTypes fuelTypes)
         {
             var links = new List<HATEOASLink>
