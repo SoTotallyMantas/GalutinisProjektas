@@ -1,0 +1,116 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.left-section, .right-section {
+    width: 45%;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+.data-table-container {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.table-header {
+    background-color: #f4f4f4;
+}
+
+.table-row {
+    display: flex;
+}
+
+.table-cell {
+    flex: 1;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.flight-info-table {
+    margin-top: 20px;
+    position: relative;
+}
+
+    .flight-info-table h2 {
+        margin-bottom: 10px;
+    }
+
+    .flight-info-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .flight-info-table th, .flight-info-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+        .flight-info-table th.hidden {
+            display: none;
+        }
+
+    .flight-info-table tbody tr {
+        cursor: pointer;
+        position: relative;
+    }
+
+.actions-container {
+    display: flex;
+    gap: 10px;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 200px; /* Ensure buttons do not overflow */
+    white-space: nowrap; /* Ensure buttons stay on one line */
+    z-index: 1; /* Ensure buttons are on top */
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.delete-button, .add-segment-button {
+    background-color: red;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    border-radius: 3px;
+    border: none;
+    white-space: nowrap; /* Ensure text stays on one line */
+}
+
+.add-segment-button {
+    background-color: green;
+    white-space: nowrap; /* Ensure text stays on one line */
+}
