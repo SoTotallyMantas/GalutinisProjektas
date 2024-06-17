@@ -37,10 +37,10 @@ namespace GalutinisProjektas.Server.Controllers
          /// <remarks>
          ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
          ///  </remarks>
-         /// <response code="201">Returns the air pollution data for the specified location</response>
+         /// <response code="200">Returns the air pollution data for the specified location</response>
          /// <response code="400">If the request is invalid</response>
         [HttpPost(Name = RouteName)]
-        [ProducesResponseType(typeof(AirPollutionResponse), 201)]
+        [ProducesResponseType(typeof(AirPollutionResponse), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         
         public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
@@ -48,7 +48,7 @@ namespace GalutinisProjektas.Server.Controllers
             try
             {
                 var serviceResponse = await _openWeatherMapService.GetAirPollutionDataAsync(latitude, longitude);
-                if (serviceResponse.StatusCode != 201)
+                if (serviceResponse.StatusCode != 200)
                 {
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }
@@ -58,7 +58,7 @@ namespace GalutinisProjektas.Server.Controllers
                 {
                     Href = Url.Link(RouteName, new { latitude, longitude }),
                     Rel = "self",
-                    Method = "Post"
+                    Method = "Get"
                 });
                 return Ok(airPollutionResponse);
             }

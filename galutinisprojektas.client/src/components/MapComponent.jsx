@@ -29,7 +29,7 @@ const MapComponent = ({ setCoordinates }) => {
     };
 
     return (
-        <LoadScript googleMapsApiKey="API-KEY">
+        <LoadScript googleMapsApiKey="AIzaSyA92Ay4Bu65NDUDk16b3Ad_7YyFnavaULQ">
             <GoogleMap
                 mapContainerStyle={containerStyle}
                 center={center}
