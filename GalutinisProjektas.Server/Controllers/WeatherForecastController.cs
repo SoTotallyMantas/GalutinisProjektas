@@ -19,6 +19,10 @@ namespace GalutinisProjektas.Server.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves weather forecasts for the next 5 days.
+        /// </summary>
+        /// <returns>An array of weather forecasts.</returns>
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
