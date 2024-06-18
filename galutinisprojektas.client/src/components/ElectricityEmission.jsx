@@ -86,7 +86,6 @@ const ElectricityEmission = () => {
         const row = filteredData[index];
         return (
             <div
-                className="list-item"
                 style={{
                     ...style,
                     backgroundColor: selectedCountry && selectedCountry.id === row.id ? 'lightgray' : 'white',
@@ -96,7 +95,7 @@ const ElectricityEmission = () => {
                 onClick={() => handleRowClick(row)}
             >
                 <div style={{ flex: 1, padding: '10px' }}>{row.countryCode}</div>
-                <div style={{ flex: 1, padding: '10px' }}>{row.countryName}</div>
+                <div style={{ flex: 3, padding: '10px' }}>{row.countryName}</div>
             </div>
         );
     }, [filteredData, selectedCountry]);
@@ -104,9 +103,7 @@ const ElectricityEmission = () => {
     return (
         <div className="container">
             <div className="left-section">
-                <div>
-                    <h1>Electricity Emission</h1>
-                </div>
+                <h1>Electricity Emission</h1>
                 <ComboBox
                     label="Unit:"
                     options={options}
@@ -137,7 +134,6 @@ const ElectricityEmission = () => {
                         </div>
                     </div>
                     <List
-                        className="electricity-list"
                         height={350}
                         itemCount={filteredData.length}
                         itemSize={35}
