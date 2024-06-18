@@ -185,8 +185,12 @@ namespace GalutinisProjektas.Server.Controllers
 
             var links = new List<HATEOASLink>
             {
+                   (method == "GET") ? new HATEOASLink { Href = Url.Action("GetIATACodes", null), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = "/IATACodes", Rel = "Get all IATA Codes", Method = "GET" },
+                (method == "GETID") ? new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Get IATA Code by ID", Method = "GET" },
+                (method == "GETBYIATA") ? new HATEOASLink { Href = Url.Action("GetByIATA", new { iataCodes.IATA }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetByIATA", new { iataCodes.IATA }), Rel = "Get IATA code information by IATA code", Method = "GET" }
+           
 
-            };
+        };
 
             return links;
         }
