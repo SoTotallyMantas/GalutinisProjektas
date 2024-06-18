@@ -16,9 +16,9 @@ namespace GalutinisProjektas.Server.Controllers
     public class CarbonInterfaceController : Controller
     {
         private readonly ILogger<CarbonInterfaceController> _logger;
-        private readonly CarbonInterfaceService _carbonInterfaceService;
+        private readonly ICarbonInterfaceService _carbonInterfaceService;
 
-        public CarbonInterfaceController(ILogger<CarbonInterfaceController> logger, CarbonInterfaceService carbonInterfaceService)
+        public CarbonInterfaceController(ILogger<CarbonInterfaceController> logger, ICarbonInterfaceService carbonInterfaceService)
         {
             _carbonInterfaceService = carbonInterfaceService;
             _logger = logger;
@@ -48,14 +48,31 @@ namespace GalutinisProjektas.Server.Controllers
                 {
                     return StatusCode(result.StatusCode, result.ErrorMessage);
                 }
+
+  
+
                 var electricityEstimateResponse = result.Data;
-                
-                electricityEstimateResponse.Links.Add(new HATEOASLink
+
+                if (Url == null)
                 {
-                    Href = Url.Link("Electricity", new { request.electricity_unit, request.electricity_value, request.country}),
-                    Rel = "self",
-                    Method = "Post"
-                });
+                    electricityEstimateResponse.Links.Add(new HATEOASLink
+                    {
+
+                        Href = null,
+                        Rel = "self",
+                        Method = "Post"
+                    });
+                }
+                else
+                {
+                    electricityEstimateResponse.Links.Add(new HATEOASLink
+                    {
+
+                        Href = Url.Action("Electricity", new { request.electricity_unit, request.electricity_value, request.country }),
+                        Rel = "self",
+                        Method = "Post"
+                    });
+                }
 
                 return Ok(electricityEstimateResponse);
 

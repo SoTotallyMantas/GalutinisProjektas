@@ -1,24 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using NUnit.Framework;
-using System.Net.Http;
 using System.Threading.Tasks;
 using GalutinisProjektas.Server.Controllers;
 using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
-using GalutinisProjektas.Server.Service;
 using GalutinisProjektas.Server.Models.UtilityModels;
+using GalutinisProjektas.Server.Service;
 
 namespace ReqNrollTests.StepDefinitions
 {
     [Binding]
     public class CarbonEmissionsEstimationStepDefinitions
     {
-        private Mock<CarbonInterfaceService> _serviceMock;
+        private Mock<ICarbonInterfaceService> _serviceMock;
         private CarbonInterfaceController _controller;
         private ActionResult<ElectricityEstimateResponse> _electricityResult;
         private ActionResult<FlightEstimateResponse> _flightResult;
@@ -26,15 +24,45 @@ namespace ReqNrollTests.StepDefinitions
 
         public CarbonEmissionsEstimationStepDefinitions()
         {
-            var mockConfiguration = new Mock<IConfiguration>();
-            _serviceMock = new Mock<CarbonInterfaceService>(MockBehavior.Strict, new HttpClient(), Mock.Of<ILogger<CarbonInterfaceService>>(), mockConfiguration.Object);
+            _serviceMock = new Mock<ICarbonInterfaceService>();
             _controller = new CarbonInterfaceController(Mock.Of<ILogger<CarbonInterfaceController>>(), _serviceMock.Object);
         }
 
         [Given("the carbon interface service is available")]
         public void GivenTheCarbonInterfaceServiceIsAvailable()
         {
-            // Service mock is already setup in constructor
+            _serviceMock.Setup(s => s.GetElectricityEstimateAsync(It.IsAny<CarbonElectricity>()))
+                .ReturnsAsync(new ServiceResponse<ElectricityEstimateResponse>
+                {
+                    Data = new ElectricityEstimateResponse
+                    {
+                        Data = new ElectricityResponseData { Id = "123", Type = "electricity", Attributes = new ElectricityResponseAttributes { CarbonKg = 50 } },
+                        Links = new System.Collections.Generic.List<HATEOASLink>()
+                    },
+                    StatusCode = 201
+                });
+
+            _serviceMock.Setup(s => s.GetFlightEstimateAsync(It.IsAny<CarbonFlight>()))
+                .ReturnsAsync(new ServiceResponse<FlightEstimateResponse>
+                {
+                    Data = new FlightEstimateResponse
+                    {
+                        Data = new FlightResponseData { Id = "456", Type = "flight", Attributes = new FlightResponseAttributes { CarbonKg = 200 } },
+                        Links = new System.Collections.Generic.List<HATEOASLink>()
+                    },
+                    StatusCode = 201
+                });
+
+            _serviceMock.Setup(s => s.GetFuelEstimateAsync(It.IsAny<CarbonFuelCombustion>()))
+                .ReturnsAsync(new ServiceResponse<FuelCumbustionEstimateResponse>
+                {
+                    Data = new FuelCumbustionEstimateResponse
+                    {
+                        Data = new FuelCombustionResponseData { Id = "789", Type = "fuel_combustion", Attributes = new FuelCombustionResponseAttributes { CarbonKg = 300 } },
+                        Links = new System.Collections.Generic.List<HATEOASLink>()
+                    },
+                    StatusCode = 201
+                });
         }
 
         [When("I request electricity carbon emission estimate")]
@@ -47,17 +75,6 @@ namespace ReqNrollTests.StepDefinitions
                 electricity_value = 100,
                 country = "USA"
             };
-
-            _serviceMock.Setup(s => s.GetElectricityEstimateAsync(It.IsAny<CarbonElectricity>()))
-                        .ReturnsAsync(new ServiceResponse<ElectricityEstimateResponse>
-                        {
-                            Data = new ElectricityEstimateResponse
-                            {
-                                Data = new ElectricityResponseData { Id = "123", Type = "electricity", Attributes = new ElectricityResponseAttributes { CarbonKg = 50 } },
-                                Links = new System.Collections.Generic.List<HATEOASLink>()
-                            },
-                            StatusCode = 201
-                        });
 
             var result = await _controller.GetElectricityEstimate(request);
             _electricityResult = ConvertToActionResult<ElectricityEstimateResponse>(result);
@@ -90,17 +107,6 @@ namespace ReqNrollTests.StepDefinitions
                 distance_unit = "km"
             };
 
-            _serviceMock.Setup(s => s.GetFlightEstimateAsync(It.IsAny<CarbonFlight>()))
-                        .ReturnsAsync(new ServiceResponse<FlightEstimateResponse>
-                        {
-                            Data = new FlightEstimateResponse
-                            {
-                                Data = new FlightResponseData { Id = "456", Type = "flight", Attributes = new FlightResponseAttributes { CarbonKg = 200 } },
-                                Links = new System.Collections.Generic.List<HATEOASLink>()
-                            },
-                            StatusCode = 201
-                        });
-
             var result = await _controller.GetFlightEstimate(request);
             _flightResult = ConvertToActionResult<FlightEstimateResponse>(result);
         }
@@ -109,9 +115,9 @@ namespace ReqNrollTests.StepDefinitions
         public void ThenTheResponseShouldBeSuccessfulAndContainTheFlightEstimate()
         {
             Assert.IsNotNull(_flightResult);
-            Assert.IsInstanceOf<OkObjectResult>(_flightResult.Result);
+            Assert.IsInstanceOf<ObjectResult>(_flightResult.Result);
 
-            var okResult = _flightResult.Result as OkObjectResult;
+            var okResult = _flightResult.Result as ObjectResult;
             var flightEstimate = okResult?.Value as FlightEstimateResponse;
 
             Assert.IsNotNull(flightEstimate);
@@ -129,17 +135,6 @@ namespace ReqNrollTests.StepDefinitions
                 fuel_source_value = 100
             };
 
-            _serviceMock.Setup(s => s.GetFuelEstimateAsync(It.IsAny<CarbonFuelCombustion>()))
-                        .ReturnsAsync(new ServiceResponse<FuelCumbustionEstimateResponse>
-                        {
-                            Data = new FuelCumbustionEstimateResponse
-                            {
-                                Data = new FuelCombustionResponseData { Id = "789", Type = "fuel_combustion", Attributes = new FuelCombustionResponseAttributes { CarbonKg = 300 } },
-                                Links = new System.Collections.Generic.List<HATEOASLink>()
-                            },
-                            StatusCode = 201
-                        });
-
             var result = await _controller.GetFuelEstimate(request);
             _fuelResult = ConvertToActionResult<FuelCumbustionEstimateResponse>(result);
         }
@@ -148,9 +143,9 @@ namespace ReqNrollTests.StepDefinitions
         public void ThenTheResponseShouldBeSuccessfulAndContainTheFuelCombustionEstimate()
         {
             Assert.IsNotNull(_fuelResult);
-            Assert.IsInstanceOf<OkObjectResult>(_fuelResult.Result);
+            Assert.IsInstanceOf<ObjectResult>(_fuelResult.Result);
 
-            var okResult = _fuelResult.Result as OkObjectResult;
+            var okResult = _fuelResult.Result as ObjectResult;
             var fuelEstimate = okResult?.Value as FuelCumbustionEstimateResponse;
 
             Assert.IsNotNull(fuelEstimate);
@@ -159,7 +154,7 @@ namespace ReqNrollTests.StepDefinitions
 
         private ActionResult<T> ConvertToActionResult<T>(IActionResult result) where T : class
         {
-            if (result is OkObjectResult okResult && okResult.Value is T value)
+            if (result is ObjectResult okResult && okResult.Value is T value)
             {
                 return new ActionResult<T>(value);
             }
