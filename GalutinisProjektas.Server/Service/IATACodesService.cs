@@ -27,6 +27,11 @@ namespace GalutinisProjektas.Server.Service
         {
             return await _context.IATACodes.FirstOrDefaultAsync(x => x.IATA == IATA);
         }
+
+        internal async Task<IEnumerable<IATACodes>> GetIATACodesByCountryAsync(string country)
+        {
+           return await _context.IATACodes.Where(x => x.Country == country).ToListAsync();
+        }
     }
 }
 

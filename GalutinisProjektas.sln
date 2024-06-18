@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34902.65
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalutinisProjektas.Server", "GalutinisProjektas.Server\GalutinisProjektas.Server.csproj", "{CCAF05C9-3CD5-45E1-8E65-FC1FFC53DADB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GalutinisProjektas.Server", "GalutinisProjektas.Server\GalutinisProjektas.Server.csproj", "{CCAF05C9-3CD5-45E1-8E65-FC1FFC53DADB}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "galutinisprojektas.client", "galutinisprojektas.client\galutinisprojektas.client.esproj", "{690C8E71-1E1C-46AF-BCD6-6E7193F41338}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReqNrollTests", "ReqNrollTests\ReqNrollTests.csproj", "{646026FD-41F1-4C50-9932-2E25518540FD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{690C8E71-1E1C-46AF-BCD6-6E7193F41338}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{690C8E71-1E1C-46AF-BCD6-6E7193F41338}.Release|Any CPU.Build.0 = Release|Any CPU
 		{690C8E71-1E1C-46AF-BCD6-6E7193F41338}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{646026FD-41F1-4C50-9932-2E25518540FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{646026FD-41F1-4C50-9932-2E25518540FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{646026FD-41F1-4C50-9932-2E25518540FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{646026FD-41F1-4C50-9932-2E25518540FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

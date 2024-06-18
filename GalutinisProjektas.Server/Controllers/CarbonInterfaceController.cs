@@ -1,10 +1,11 @@
-﻿using GalutinisProjektas.Server.Models;
+﻿using GalutinisProjektas.Server.Interface;
+using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
-using GalutinisProjektas.Server.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -16,9 +17,9 @@ namespace GalutinisProjektas.Server.Controllers
     public class CarbonInterfaceController : Controller
     {
         private readonly ILogger<CarbonInterfaceController> _logger;
-        private readonly CarbonInterfaceService _carbonInterfaceService;
+        private readonly ICarbonInterfaceService _carbonInterfaceService;
 
-        public CarbonInterfaceController(ILogger<CarbonInterfaceController> logger, CarbonInterfaceService carbonInterfaceService)
+        public CarbonInterfaceController(ILogger<CarbonInterfaceController> logger, ICarbonInterfaceService carbonInterfaceService)
         {
             _carbonInterfaceService = carbonInterfaceService;
             _logger = logger;
@@ -46,27 +47,39 @@ namespace GalutinisProjektas.Server.Controllers
 
                 if (result.StatusCode != 201)
                 {
+                    _logger.LogError($"Error: {result.ErrorMessage}, StatusCode: {result.StatusCode}");
                     return StatusCode(result.StatusCode, result.ErrorMessage);
                 }
+
                 var electricityEstimateResponse = result.Data;
-                
-                electricityEstimateResponse.Links.Add(new HATEOASLink
+
+                if (Url == null)
                 {
-                    Href = Url.Link("Electricity", new { request.electricity_unit, request.electricity_value, request.country}),
-                    Rel = "self",
-                    Method = "Post"
-                });
+                    _logger.LogWarning("Url is null, cannot add HATEOAS link.");
+                    electricityEstimateResponse.Links.Add(new HATEOASLink
+                    {
+                        Href = null,
+                        Rel = "self",
+                        Method = "Post"
+                    });
+                }
+                else
+                {
+                    electricityEstimateResponse.Links.Add(new HATEOASLink
+                    {
+                        Href = Url.Action("Electricity", new { request.electricity_unit, request.electricity_value, request.country }),
+                        Rel = "self",
+                        Method = "Post"
+                    });
+                }
 
                 return Ok(electricityEstimateResponse);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Exception occurred while fetching data from Carbon Interface API: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
-
         }
         /// <summary>
         /// Retrieves the carbon emissions estimate for a flight
@@ -78,8 +91,7 @@ namespace GalutinisProjektas.Server.Controllers
         ///  </remarks>
         /// <response code="201">Returns the carbon emissions estimate for Flight</response>
         ///  <response code="400">If the request is invalid</response>
-
-        [HttpPost("Flight", Name ="Flight")]
+        [HttpPost("Flight", Name = "Flight")]
         [ProducesResponseType(typeof(FlightEstimateResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetFlightEstimate([FromBody] CarbonFlight request)
@@ -91,24 +103,40 @@ namespace GalutinisProjektas.Server.Controllers
 
                 if (serviceResponse.StatusCode != 201)
                 {
+                    _logger.LogError($"Error: {serviceResponse.ErrorMessage}, StatusCode: {serviceResponse.StatusCode}");
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }
+
                 var flightEstimateResponse = serviceResponse.Data;
+
+                if (flightEstimateResponse == null)
+                {
+                    _logger.LogError("flightEstimateResponse is null.");
+                    return StatusCode(500, "Internal server error: flightEstimateResponse is null.");
+                }
+
+                if (flightEstimateResponse.Links == null)
+                {
+                    flightEstimateResponse.Links = new List<HATEOASLink>();
+                }
+
                 flightEstimateResponse.Links.Add(new HATEOASLink
                 {
-                    Href =  Url.Link("Flight",null),
+                    Href = Url?.Link("Flight", null),
                     Rel = "self",
                     Method = "Post"
                 });
-                return Ok(flightEstimateResponse);
 
+                return Ok(flightEstimateResponse);
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Exception occurred while fetching data from Carbon Interface API: {ex.Message}");
-                return StatusCode(500, "Internal server error");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
         /// <summary>
         /// Retrieves the carbon emissions estimate for fuel combustions
         /// </summary>
@@ -128,25 +156,40 @@ namespace GalutinisProjektas.Server.Controllers
             {
                 request.type = "fuel_combustion";
                 var serviceResponse = await _carbonInterfaceService.GetFuelEstimateAsync(request);
+
                 if (serviceResponse.StatusCode != 201)
                 {
+                    _logger.LogError($"Error: {serviceResponse.ErrorMessage}, StatusCode: {serviceResponse.StatusCode}");
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }
+
                 var fuelCumbustionEstimateResponse = serviceResponse.Data;
+
+                if (fuelCumbustionEstimateResponse == null)
+                {
+                    _logger.LogError("fuelCumbustionEstimateResponse is null.");
+                    return StatusCode(500, "Internal server error: fuelCumbustionEstimateResponse is null.");
+                }
+
+                if (fuelCumbustionEstimateResponse.Links == null)
+                {
+                    fuelCumbustionEstimateResponse.Links = new List<HATEOASLink>();
+                }
+
                 fuelCumbustionEstimateResponse.Links.Add(new HATEOASLink
                 {
-                    Href = Url.Link("Fuel", new { request.fuel_source_type, request.fuel_source_unit, request.fuel_source_value }),
+                    Href = Url?.Link("Fuel", new { request.fuel_source_type, request.fuel_source_unit, request.fuel_source_value }),
                     Rel = "self",
                     Method = "Post"
                 });
+
                 return Ok(fuelCumbustionEstimateResponse);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError($"Exception occurred while fetching data from Carbon Interface API: {ex.Message}");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
         }
     }
 }

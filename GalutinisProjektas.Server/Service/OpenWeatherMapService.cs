@@ -1,22 +1,27 @@
-﻿using GalutinisProjektas.Server.Models.AirPollutionResponse;
+﻿using GalutinisProjektas.Server.Interface;
+using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Models.AirPollutionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
-    public class OpenWeatherMapService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenWeatherMapService> logger)
+    public class OpenWeatherMapService : IOpenWeatherMapService
     {
-        private readonly HttpClient _httpClient = httpClient;
-#pragma warning disable CS8601 // Possible null reference assignment.
-        private readonly string _apiKey = configuration["OpenWeatherMap:ApiKey"];  // API key is stored in appsettings.json
-#pragma warning restore CS8601 // Possible null reference assignment.
-        private readonly ILogger<OpenWeatherMapService> _logger = logger;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
+        private readonly ILogger<OpenWeatherMapService> _logger;
 
-
-        public async Task<ServiceResponse<AirPollutionResponse>> GetAirPollutionDataAsync(double latitude,double longtitude)
+        public OpenWeatherMapService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenWeatherMapService> logger)
         {
+            _httpClient = httpClient;
+            _apiKey = configuration["OpenWeatherMap:ApiKey"];  // API key is stored in appsettings.json
+            _logger = logger;
+        }
 
-           string url = $"http://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longtitude}&appid={_apiKey}";
+        public async Task<ServiceResponse<AirPollutionResponse>> GetAirPollutionDataAsync(double latitude, double longitude)
+        {
+            string url = $"http://api.openweathermap.org/data/2.5/air_pollution?lat={latitude}&lon={longitude}&appid={_apiKey}";
             try
             {
                 var response = await _httpClient.GetAsync(url);
@@ -47,7 +52,6 @@ namespace GalutinisProjektas.Server.Service
                     ErrorMessage = "Internal server error"
                 };
             }
-        }}
-
+        }
     }
-
+}
