@@ -18,9 +18,9 @@ namespace ReqNrollTests.StepDefinitions
     {
         private Mock<ICarbonInterfaceService> _serviceMock;
         private CarbonInterfaceController _controller;
-        private ActionResult<ElectricityEstimateResponse> _electricityResult;
-        private ActionResult<FlightEstimateResponse> _flightResult;
-        private ActionResult<FuelCumbustionEstimateResponse> _fuelResult;
+        private IActionResult _electricityResult;
+        private IActionResult _flightResult;
+        private IActionResult _fuelResult;
 
         public CarbonEmissionsEstimationStepDefinitions()
         {
@@ -76,17 +76,17 @@ namespace ReqNrollTests.StepDefinitions
                 country = "USA"
             };
 
-            var result = await _controller.GetElectricityEstimate(request);
-            _electricityResult = ConvertToActionResult<ElectricityEstimateResponse>(result);
+            _electricityResult = await _controller.GetElectricityEstimate(request);
+            LogResult(_electricityResult);
         }
 
         [Then("the response should be successful and contain the electricity estimate")]
         public void ThenTheResponseShouldBeSuccessfulAndContainTheElectricityEstimate()
         {
             Assert.IsNotNull(_electricityResult);
-            Assert.IsInstanceOf<OkObjectResult>(_electricityResult.Result);
+            Assert.IsInstanceOf<OkObjectResult>(_electricityResult);
 
-            var okResult = _electricityResult.Result as OkObjectResult;
+            var okResult = _electricityResult as OkObjectResult;
             var electricityEstimate = okResult?.Value as ElectricityEstimateResponse;
 
             Assert.IsNotNull(electricityEstimate);
@@ -107,17 +107,17 @@ namespace ReqNrollTests.StepDefinitions
                 distance_unit = "km"
             };
 
-            var result = await _controller.GetFlightEstimate(request);
-            _flightResult = ConvertToActionResult<FlightEstimateResponse>(result);
+            _flightResult = await _controller.GetFlightEstimate(request);
+            LogResult(_flightResult);
         }
 
         [Then("the response should be successful and contain the flight estimate")]
         public void ThenTheResponseShouldBeSuccessfulAndContainTheFlightEstimate()
         {
             Assert.IsNotNull(_flightResult);
-            Assert.IsInstanceOf<ObjectResult>(_flightResult.Result);
+            Assert.IsInstanceOf<OkObjectResult>(_flightResult);
 
-            var okResult = _flightResult.Result as ObjectResult;
+            var okResult = _flightResult as OkObjectResult;
             var flightEstimate = okResult?.Value as FlightEstimateResponse;
 
             Assert.IsNotNull(flightEstimate);
@@ -135,34 +135,33 @@ namespace ReqNrollTests.StepDefinitions
                 fuel_source_value = 100
             };
 
-            var result = await _controller.GetFuelEstimate(request);
-            _fuelResult = ConvertToActionResult<FuelCumbustionEstimateResponse>(result);
+            _fuelResult = await _controller.GetFuelEstimate(request);
+            LogResult(_fuelResult);
         }
 
         [Then("the response should be successful and contain the fuel combustion estimate")]
         public void ThenTheResponseShouldBeSuccessfulAndContainTheFuelCombustionEstimate()
         {
             Assert.IsNotNull(_fuelResult);
-            Assert.IsInstanceOf<ObjectResult>(_fuelResult.Result);
+            Assert.IsInstanceOf<OkObjectResult>(_fuelResult);
 
-            var okResult = _fuelResult.Result as ObjectResult;
+            var okResult = _fuelResult as OkObjectResult;
             var fuelEstimate = okResult?.Value as FuelCumbustionEstimateResponse;
 
             Assert.IsNotNull(fuelEstimate);
             Assert.AreEqual("789", fuelEstimate.Data.Id);
         }
 
-        private ActionResult<T> ConvertToActionResult<T>(IActionResult result) where T : class
+        private void LogResult(IActionResult result)
         {
-            if (result is ObjectResult okResult && okResult.Value is T value)
+            if (result is ObjectResult objectResult)
             {
-                return new ActionResult<T>(value);
+                Console.WriteLine($"Result: {objectResult.StatusCode}, Value: {objectResult.Value}");
             }
-            else if (result is ObjectResult objectResult && objectResult.Value is T objValue)
+            else
             {
-                return new ActionResult<T>(objValue);
+                Console.WriteLine("Result is not an ObjectResult.");
             }
-            return new ActionResult<T>(result as T);
         }
     }
 }
