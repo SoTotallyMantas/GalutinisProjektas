@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using GalutinisProjektas.Server.Controllers;
 using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Models.AirPollutionResponse;
-using GalutinisProjektas.Server.Service;
 using GalutinisProjektas.Server.Models.UtilityModels;
+using GalutinisProjektas.Server.Interfaces;
 
 namespace ReqNrollQuickstart.Specs.StepDefinitions
 {

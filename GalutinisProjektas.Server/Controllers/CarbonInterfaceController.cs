@@ -1,10 +1,10 @@
-﻿using GalutinisProjektas.Server.Models;
+﻿using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
-using GalutinisProjektas.Server.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

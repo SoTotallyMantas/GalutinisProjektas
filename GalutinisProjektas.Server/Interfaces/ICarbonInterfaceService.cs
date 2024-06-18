@@ -4,7 +4,7 @@ using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
 
-namespace GalutinisProjektas.Server.Service
+namespace GalutinisProjektas.Server.Interface
 {
     public interface ICarbonInterfaceService
     {

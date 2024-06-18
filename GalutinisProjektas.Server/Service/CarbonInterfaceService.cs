@@ -1,4 +1,5 @@
-﻿using GalutinisProjektas.Server.Models.Carbon;
+﻿using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;

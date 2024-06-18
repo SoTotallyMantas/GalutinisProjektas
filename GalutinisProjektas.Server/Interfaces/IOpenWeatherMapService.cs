@@ -1,7 +1,7 @@
 ﻿using GalutinisProjektas.Server.Models.AirPollutionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
 
-namespace GalutinisProjektas.Server.Service
+namespace GalutinisProjektas.Server.Interfaces
 {
     public interface IOpenWeatherMapService
     {

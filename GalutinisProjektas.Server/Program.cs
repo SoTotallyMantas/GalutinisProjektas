@@ -43,9 +43,8 @@ builder.Services.AddSwaggerGen(options =>
 }
 );
 // Add OpenWeatherMap service
-builder.Services.AddSingleton<OpenWeatherMapService>();
-// Add CarbonInterface service
-builder.Services.AddSingleton<CarbonInterfaceService>();
+builder.Services.AddSingleton<IOpenWeatherMapService, OpenWeatherMapService>();
+builder.Services.AddScoped<ICarbonInterfaceService, CarbonInterfaceService>();
 // Add CountryCodes service
 builder.Services.AddScoped<CountryCodesService>();
 // Add IATACodes service

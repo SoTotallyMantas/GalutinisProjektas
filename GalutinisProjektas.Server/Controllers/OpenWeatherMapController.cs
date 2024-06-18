@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using GalutinisProjektas.Server.Service;
 using GalutinisProjektas.Server.Models.AirPollutionResponse;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using System;
+using GalutinisProjektas.Server.Interfaces;
 //n
 namespace GalutinisProjektas.Server.Controllers
 {

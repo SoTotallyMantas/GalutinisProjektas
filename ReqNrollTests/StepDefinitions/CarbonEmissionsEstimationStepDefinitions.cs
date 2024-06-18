@@ -9,7 +9,7 @@ using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
-using GalutinisProjektas.Server.Service;
+using GalutinisProjektas.Server.Interfaces;
 
 namespace ReqNrollTests.StepDefinitions
 {
