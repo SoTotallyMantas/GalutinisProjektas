@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './Emission.css';
+import './List.css';
 import ComboBox from './ComboBox';
 
 const FuelCombustionEmission = () => {
     const [fuelTypes, setFuelTypes] = useState([]);
     const [filteredUnits, setFilteredUnits] = useState([]);
     const [selectedFuelType, setSelectedFuelType] = useState('');
+    const [selectedFuelUnit, setSelectedFuelUnit] = useState('');
     const [value, setValue] = useState('');
+    const [emissionResult, setEmissionResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetch('/FuelTypes')
@@ -37,13 +42,39 @@ const FuelCombustionEmission = () => {
         }
     }, [selectedFuelType]);
 
+    const fetchEmissionData = async () => {
+        if (!selectedFuelType || !selectedFuelUnit || !value) {
+            setError("Please select fuel type, unit, and enter a value.");
+            return;
+        }
+
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(`/CarbonInterface/Fuel?fuel_source_type=${selectedFuelType}&fuel_source_unit=${selectedFuelUnit}&fuel_source_value=${value}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const result = await response.json();
+            setEmissionResult(result.data);
+        } catch (error) {
+            setError(error.toString());
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="container">
             <div className="left-section">
                 <div>
                     <h1>Fuel Combustion Emission</h1>
                 </div>
-
                 <ComboBox
                     label="Fuel Type:"
                     options={fuelTypes}
@@ -52,18 +83,34 @@ const FuelCombustionEmission = () => {
                 <ComboBox
                     label="Fuel Unit:"
                     options={filteredUnits}
+                    onSelect={setSelectedFuelUnit}
                     disabled={!selectedFuelType}
                 />
-
                 <div className="input-group">
                     <label>Value:</label>
-                    <input type="text" />
+                    <input
+                        type="number"
+                        value={value}
+                        onChange={(e) => setValue(e.target.value)}
+                    />
                 </div>
-                <button className="result-button">Get result</button>
+                <button className="result-button" onClick={fetchEmissionData}>Get result</button>
             </div>
             <div className="right-section">
                 <p>Emission Result</p>
-                <div className="big-box"></div>
+                {loading && <p>Loading...</p>}
+                {error && <p>{error}</p>}
+                {emissionResult && (
+                    <div className="list-item">
+                        <div>Fuel Source Type: {emissionResult.attributes.fuel_source_type}</div>
+                        <div>Fuel Source Unit: {emissionResult.attributes.fuel_source_unit}</div>
+                        <div>Fuel Source Value: {emissionResult.attributes.fuel_source_value}</div>
+                        <div>Carbon (g): {emissionResult.attributes.carbon_g}</div>
+                        <div>Carbon (lb): {emissionResult.attributes.carbon_lb}</div>
+                        <div>Carbon (kg): {emissionResult.attributes.carbon_kg}</div>
+                        <div>Carbon (mt): {emissionResult.attributes.carbon_mt}</div>
+                    </div>
+                )}
             </div>
         </div>
     );
