@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using GalutinisProjektas.Server.Interfaces;
 
 namespace GalutinisProjektas.Server.Controllers
+{ 
 
     [ApiController]
     [Route("[controller]")]
