@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FixedSizeList as List } from 'react-window';
-import './FlightEmission.css';
+import styles from './FlightResult.module.css';
 
 const FlightEmission = () => {
     const navigate = useNavigate();
@@ -48,7 +48,38 @@ const FlightEmission = () => {
 
     const goToFlightCombustionResult = () => {
         if (validatePassengers()) {
-            navigate('/flightCombustionResult');
+            const legs = flightSegments.map(segment => ({
+                departure_airport: segment.departure.IATACode,
+                destination_airport: segment.destination.IATACode
+            }));
+
+            const requestBody = {
+                type: 'flight',
+                passengers: parseInt(passengers, 10),
+                legs: legs,
+                distance_unit: measurementUnit
+            };
+
+            fetch('/CarbonInterface/Flight', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    navigate('/flightCombustionResult', { state: { result: data } });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         } else {
             alert('Passengers must be a positive number.');
         }
@@ -94,7 +125,7 @@ const FlightEmission = () => {
 
     const handleAddNewSegment = () => {
         setFlightSegments([...flightSegments, { departure: null, destination: null }]);
-        setCurrentSegmentIndex(flightSegments.length); // Select the new segment
+        setCurrentSegmentIndex(flightSegments.length);
     };
 
     const handleSegmentClick = (index) => {
@@ -130,12 +161,12 @@ const FlightEmission = () => {
     }, [filteredData, selectedRow]);
 
     return (
-        <div className="container">
-            <div className="left-section">
+        <div className={styles["flight-emission-container"]}>
+            <div className={styles["left-section"]}>
                 <div>
                     <h1>Flight Emission</h1>
                 </div>
-                <div className="input-group">
+                <div className={styles["input-group"]}>
                     <label>Country:</label>
                     <input
                         type="text"
@@ -143,17 +174,17 @@ const FlightEmission = () => {
                         onChange={(e) => setCountryFilter(e.target.value)}
                     />
                 </div>
-                <div className="data-table-container">
-                    <div className="table-header">
-                        <div className="table-row">
-                            <div className="table-cell">IATA Code</div>
-                            <div className="table-cell">City</div>
-                            <div className="table-cell">Airport Name</div>
-                            <div className="table-cell">Country</div>
+                <div className={styles["data-table-container"]}>
+                    <div className={styles["table-header"]}>
+                        <div className={styles["table-row"]}>
+                            <div className={styles["table-cell"]}>IATA Code</div>
+                            <div className={styles["table-cell"]}>City</div>
+                            <div className={styles["table-cell"]}>Airport Name</div>
+                            <div className={styles["table-cell"]}>Country</div>
                         </div>
                     </div>
                     <List
-                        height={350} // Adjust height to fit within the container
+                        height={350}
                         itemCount={filteredData.length}
                         itemSize={35}
                         width={'100%'}
@@ -161,21 +192,23 @@ const FlightEmission = () => {
                         {Row}
                     </List>
                 </div>
-                <div className="button-group">
+                <div className={styles["button-group"]}>
                     <button
+                        className={styles["button"]}
                         onClick={handleSetDeparture}
                         disabled={!selectedRow || currentSegmentIndex === null}
                     >
                         Set as Departure
                     </button>
                     <button
+                        className={styles["button"]}
                         onClick={handleSetDestination}
                         disabled={!selectedRow || currentSegmentIndex === null}
                     >
                         Set as Destination
                     </button>
                 </div>
-                <div className="input-group">
+                <div className={`${styles["input-group"]} ${styles["passengers"]}`}>
                     <label>Passengers:</label>
                     <input
                         type="text"
@@ -183,23 +216,23 @@ const FlightEmission = () => {
                         onChange={handlePassengersChange}
                     />
                 </div>
-                <div className="input-group">
+                <div className={styles["input-group"]}>
                     <label>Measurement Unit:</label>
                     <select value={measurementUnit} onChange={(e) => setMeasurementUnit(e.target.value)}>
-                        <option value="miles">Miles</option>
+                        <option value="mi">Miles</option>
                         <option value="km">Kilometers</option>
                     </select>
                 </div>
             </div>
-            <div className="right-section">
-                <div className="flight-info-table">
+            <div className={styles["right-section"]}>
+                <div className={styles["flight-info-table"]}>
                     <h2>Flight Information:</h2>
                     <table>
                         <thead>
                             <tr>
                                 <th>Departure Airport</th>
                                 <th>Destination Airport</th>
-                                <th className="hidden">Actions</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,19 +248,25 @@ const FlightEmission = () => {
                                 >
                                     <td>{segment.departure ? `${segment.departure.IATACode} - ${segment.departure.airportName}, ${segment.departure.city}, ${segment.departure.country}` : 'Not selected'}</td>
                                     <td>{segment.destination ? `${segment.destination.IATACode} - ${segment.destination.airportName}, ${segment.destination.city}, ${segment.destination.country}` : 'Not selected'}</td>
-                                    {index === currentSegmentIndex && (
-                                        <td className="actions-container">
-                                            <button className="delete-button" onClick={(e) => { e.stopPropagation(); handleDeleteSegment(index); }}>Delete</button>
-                                            <button className="add-segment-button" onClick={(e) => { e.stopPropagation(); handleAddNewSegment(); }}>Add New Segment</button>
-                                        </td>
-                                    )}
+                                    <td className={styles["actions-container"]}>
+                                        {index === currentSegmentIndex && (
+                                            <>
+                                                <button className={styles["delete-button"]} onClick={(e) => { e.stopPropagation(); handleDeleteSegment(index); }}>Delete</button>
+                                                <button className={styles["add-segment-button"]} onClick={(e) => { e.stopPropagation(); handleAddNewSegment(); }}>Add</button>
+                                            </>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
-                <div className="button-group">
-                    <button onClick={goToFlightCombustionResult} disabled={flightSegments.length === 0 || !flightSegments.every(segment => segment.departure && segment.destination) || !validatePassengers()}>
+                <div className={styles["button-group"]}>
+                    <button
+                        className={styles["button"]}
+                        onClick={goToFlightCombustionResult}
+                        disabled={flightSegments.length === 0 || !flightSegments.every(segment => segment.departure && segment.destination) || !validatePassengers()}
+                    >
                         Get result
                     </button>
                 </div>

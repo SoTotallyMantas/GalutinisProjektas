@@ -1,6 +1,8 @@
+/* List.css */
+
 .list-header, .list-item {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: flex-start;
     padding: 10px;
     border: 1px solid #ccc;
@@ -9,7 +11,6 @@
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 1.2em;
-
 }
 
     .list-item div {
@@ -34,3 +35,40 @@
     .list-item:hover {
         background-color: #f1f1f1;
     }
+
+/* Override styles for ElectricityEmission component */
+.electricity-list .list-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    margin: 0;
+}
+
+    .electricity-list .list-item div {
+        flex: 1;
+        padding: 10px;
+        display: flex;
+        justify-content: flex-start;
+    }
+
+        .electricity-list .list-item div span {
+            flex: 1;
+            text-align: left;
+        }
+
+.electricity-list .list-header {
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    display: flex;
+    font-weight: bold;
+}
+
+.electricity-list .list-cell {
+    flex: 1;
+    padding: 10px;
+    text-align: left;
+}

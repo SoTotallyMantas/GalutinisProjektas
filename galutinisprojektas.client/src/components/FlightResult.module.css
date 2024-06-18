@@ -1,4 +1,5 @@
-.container {
+/* FlightResult.module.css */
+.flight-emission-container {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -25,6 +26,10 @@
         box-sizing: border-box;
     }
 
+    .input-group.passengers input {
+        width: 50%; /* Shorter input box */
+    }
+
 .data-table-container {
     margin-bottom: 20px;
     border: 1px solid #ccc;
@@ -46,6 +51,7 @@
     padding: 10px;
     border-bottom: 1px solid #ddd;
     font-weight: bold;
+    text-align: left; /* Ensure left alignment */
 }
 
 .button-group {
@@ -72,11 +78,13 @@
         border: 1px solid #ddd;
         padding: 10px;
         text-align: left;
+        vertical-align: middle; /* Ensure vertical alignment */
     }
 
-        .flight-info-table th.hidden {
-            display: none;
-        }
+    .flight-info-table th {
+        text-align: left;
+        padding-left: 10px;
+    }
 
     .flight-info-table tbody tr {
         cursor: pointer;
@@ -85,32 +93,26 @@
 
 .actions-container {
     display: flex;
-    gap: 10px;
+    gap: 5px;
     position: absolute;
-    right: 0;
+    right: 10px; /* Adjust to align with the "Actions" header */
     top: 50%;
     transform: translateY(-50%);
-    max-width: 200px; /* Ensure buttons do not overflow */
-    white-space: nowrap; /* Ensure buttons stay on one line */
-    z-index: 1; /* Ensure buttons are on top */
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-}
-
-.delete-button, .add-segment-button {
-    background-color: red;
+.button, .delete-button, .add-segment-button {
+    background-color: #2196F3; /* Updated to the reference color */
     color: white;
     padding: 5px;
     cursor: pointer;
     border-radius: 3px;
-    border: none;
-    white-space: nowrap; /* Ensure text stays on one line */
+    border: none; /* Make border invisible */
+    font-size: 12px; /* Smaller font size */
+}
+.delete-button {
+    background-color: red;
 }
 
 .add-segment-button {
     background-color: green;
-    white-space: nowrap; /* Ensure text stays on one line */
 }

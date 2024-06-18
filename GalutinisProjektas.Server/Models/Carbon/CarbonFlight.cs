@@ -18,7 +18,7 @@ namespace GalutinisProjektas.Server.Models.Carbon
         public required int passengers { get; set; }
         [Required]
         [SwaggerSchema("Flight Departure/Destination Array")]
-        public required FlightLegs[] legs { get; set; }
+        public required List<FlightLegs> legs { get; set; } = new List<FlightLegs>();
 
         [Required]
         [SwaggerSchema("The distance unit of the flight")]

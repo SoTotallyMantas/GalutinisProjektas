@@ -61,10 +61,10 @@ const ElectricityEmission = () => {
         setError(null);
         try {
             const response = await fetch(`/CarbonInterface/Electricity?electricity_unit=${electricityUnit}&electricity_value=${electricityValue}&country=${selectedCountry.countryCode}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -86,6 +86,7 @@ const ElectricityEmission = () => {
         const row = filteredData[index];
         return (
             <div
+                className="list-item"
                 style={{
                     ...style,
                     backgroundColor: selectedCountry && selectedCountry.id === row.id ? 'lightgray' : 'white',
@@ -136,6 +137,7 @@ const ElectricityEmission = () => {
                         </div>
                     </div>
                     <List
+                        className="electricity-list"
                         height={350}
                         itemCount={filteredData.length}
                         itemSize={35}

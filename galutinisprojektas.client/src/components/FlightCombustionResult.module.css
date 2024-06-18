@@ -1,0 +1,52 @@
+/* FlightCombustionResult.module.css */
+.emission-result-page {
+    background-color: #ecf0f1;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+}
+
+    .emission-result-page .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        max-width: 840px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .emission-result-page .result-container {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+        .emission-result-page .result-container h2 {
+            margin-top: 0;
+        }
+
+        .emission-result-page .result-container ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+            .emission-result-page .result-container ul li {
+                margin-bottom: 10px;
+            }
+
+        .emission-result-page .result-container p,
+        .emission-result-page .result-container li {
+            margin: 5px 0;
+        }
