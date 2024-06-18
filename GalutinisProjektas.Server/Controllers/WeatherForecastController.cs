@@ -7,6 +7,9 @@ using GalutinisProjektas.Server.Models;
 
 namespace GalutinisProjektas.Server.Controllers
 {
+    /// <summary>
+    /// Controller for retrieving weather forecasts.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
@@ -18,11 +21,19 @@ namespace GalutinisProjektas.Server.Controllers
 
         private readonly ILogger<WeatherForecastController> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WeatherForecastController"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance for logging.</param>
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves weather forecasts for the next 5 days.
+        /// </summary>
+        /// <returns>An array of weather forecasts.</returns>
         [HttpGet(Name = "GetWeatherForecast")]
         public IActionResult Get()
         {

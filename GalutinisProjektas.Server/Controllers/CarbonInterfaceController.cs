@@ -12,6 +12,9 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace GalutinisProjektas.Server.Controllers
 {
+    /// <summary>
+    /// Controller for retrieving carbon emissions estimates using the CarbonInterface API.
+    /// </summary>
     [Route("[controller]")]
     [ApiController]
     public class CarbonInterfaceController : Controller
@@ -19,15 +22,24 @@ namespace GalutinisProjektas.Server.Controllers
         private readonly ILogger<CarbonInterfaceController> _logger;
         private readonly ICarbonInterfaceService _carbonInterfaceService;
 
+
+        /// <summary>
+        /// Constructor for CarbonInterfaceController.
+        /// </summary>
+        /// <param name="logger">The logger instance for logging.</param>
+        /// <param name="carbonInterfaceService">The service handling interactions with CarbonInterface API.</param>
+        
+
         public CarbonInterfaceController(ILogger<CarbonInterfaceController> logger, ICarbonInterfaceService carbonInterfaceService)
+
         {
             _carbonInterfaceService = carbonInterfaceService;
             _logger = logger;
         }
+        
         /// <summary>
         ///    Retrieves the carbon emissions estimate for electricity usage
         /// </summary>
-        /// 
         /// <param name="request"></param> CarbonElectricity object containing the electricity unit, value, country 
         /// <returns>Electricity carbon emissions Estimate</returns>
         /// <remarks>
@@ -81,6 +93,7 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+        
         /// <summary>
         /// Retrieves the carbon emissions estimate for a flight
         /// </summary>
@@ -91,7 +104,9 @@ namespace GalutinisProjektas.Server.Controllers
         ///  </remarks>
         /// <response code="201">Returns the carbon emissions estimate for Flight</response>
         ///  <response code="400">If the request is invalid</response>
+
         [HttpPost("Flight", Name = "Flight")]
+
         [ProducesResponseType(typeof(FlightEstimateResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetFlightEstimate([FromBody] CarbonFlight request)
@@ -135,7 +150,6 @@ namespace GalutinisProjektas.Server.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
-
 
         /// <summary>
         /// Retrieves the carbon emissions estimate for fuel combustions

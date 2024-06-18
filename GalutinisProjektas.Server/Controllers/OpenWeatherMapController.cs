@@ -10,16 +10,28 @@ using System.Collections.Generic;
 using GalutinisProjektas.Server.Interfaces;
 
 namespace GalutinisProjektas.Server.Controllers
-{
+
     [ApiController]
     [Route("[controller]")]
+
     public class OpenWeatherMapController : Controller
     {
         private const string RouteName = "air-pollution";
         private readonly ILogger<OpenWeatherMapController> _logger;
+
+   
+        
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenWeatherMapController"/> class.
+        /// </summary>
+        /// <param name="logger">Logger instance for logging.</param>
+        /// <param name="openWeatherMapService">Service instance for interacting with the OpenWeatherMap API.</param>
+
         private readonly IOpenWeatherMapService _openWeatherMapService;
 
         public OpenWeatherMapController(ILogger<OpenWeatherMapController> logger, IOpenWeatherMapService openWeatherMapService)
+
         {
             _openWeatherMapService = openWeatherMapService;
             _logger = logger;
@@ -41,6 +53,7 @@ namespace GalutinisProjektas.Server.Controllers
 
         [HttpGet(Name = RouteName)]
         [ProducesResponseType(typeof(AirPollutionResponse), 200)]
+
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
         {

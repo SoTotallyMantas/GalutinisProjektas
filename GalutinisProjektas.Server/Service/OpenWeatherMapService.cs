@@ -6,13 +6,28 @@ using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
+
+    /// <summary>
+    /// Service class for interacting with the OpenWeatherMap API to retrieve air pollution data.
+    /// </summary>
+
     public class OpenWeatherMapService : IOpenWeatherMapService
+
     {
         private readonly HttpClient _httpClient;
         private readonly string _apiKey;
         private readonly ILogger<OpenWeatherMapService> _logger;
 
+
+        /// <summary>
+        /// Retrieves air pollution data from the OpenWeatherMap API based on latitude and longitude.
+        /// </summary>
+        /// <param name="latitude">Latitude of the location.</param>
+        /// <param name="longitude">Longitude of the location.</param>
+        /// <returns>A ServiceResponse containing the air pollution data for the specified location.</returns>
+
         public OpenWeatherMapService(HttpClient httpClient, IConfiguration configuration, ILogger<OpenWeatherMapService> logger)
+
         {
             _httpClient = httpClient;
             _apiKey = configuration["OpenWeatherMap:ApiKey"];  // API key is stored in appsettings.json

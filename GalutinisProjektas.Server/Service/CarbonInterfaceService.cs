@@ -12,13 +12,25 @@ using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
+
+    /// <summary>
+    /// A service class for interacting with Carbon Interface API to retrieve carbon emissions estimates.
+    /// </summary>
+
     public class CarbonInterfaceService : ICarbonInterfaceService
+
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<CarbonInterfaceService> _logger;
         private readonly string _apiKey;
         private readonly string baseURL = "https://www.carboninterface.com/api/v1/estimates";
 
+        /// <summary>
+        /// Constructor for CarbonInterfaceService class.
+        /// </summary>
+        /// <param name="httpClient">HTTP client instance.</param>
+        /// <param name="logger">Logger instance.</param>
+        /// <param name="configuration">Application configuration.</param>
         public CarbonInterfaceService(HttpClient httpClient, ILogger<CarbonInterfaceService> logger, IConfiguration configuration)
         {
             _apiKey = configuration["CarbonInterface:ApiKey"];
@@ -28,6 +40,12 @@ namespace GalutinisProjektas.Server.Service
            
 
         }
+
+        /// <summary>
+        /// Retrieves fuel combustion estimate from Carbon Interface API.
+        /// </summary>
+        /// <param name="request">Fuel combustion request data.</param>
+        /// <returns>Service response containing fuel combustion estimate.</returns>
         public async Task<ServiceResponse<FuelCumbustionEstimateResponse>> GetFuelEstimateAsync(CarbonFuelCombustion request)
         {
             try
@@ -73,6 +91,11 @@ namespace GalutinisProjektas.Server.Service
 
         }
 
+        /// <summary>
+        /// Retrieves flight emission estimate from Carbon Interface API.
+        /// </summary>
+        /// <param name="request">Flight emission request data.</param>
+        /// <returns>Service response containing flight emission estimate.</returns>
         public async Task<ServiceResponse<FlightEstimateResponse>> GetFlightEstimateAsync(CarbonFlight request)
         {
             try
@@ -117,6 +140,11 @@ namespace GalutinisProjektas.Server.Service
             }
         }
 
+        /// <summary>
+        /// Retrieves electricity emission estimate from Carbon Interface API.
+        /// </summary>
+        /// <param name="request">Electricity emission request data.</param>
+        /// <returns>Service response containing electricity emission estimate.</returns>
         public async Task<ServiceResponse<ElectricityEstimateResponse>> GetElectricityEstimateAsync(CarbonElectricity request)
         {
             try
