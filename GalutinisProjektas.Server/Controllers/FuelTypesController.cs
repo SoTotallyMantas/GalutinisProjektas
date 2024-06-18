@@ -150,6 +150,10 @@ namespace GalutinisProjektas.Server.Controllers
         }
         private List<HATEOASLink> HATEOASLinks(string method, FuelTypes fuelTypes)
         {
+            if (Url == null)
+            {
+                return new List<HATEOASLink>();
+            }
             var links = new List<HATEOASLink>
             {
                (method == "GET") ? new HATEOASLink { Href = Url.Action("GetFuelTypes", null), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = "/FuelTypes", Rel = "Get all Fuel Types", Method = "GET" },
