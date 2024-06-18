@@ -9,7 +9,7 @@ const FlightEmission = () => {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
     const [countryFilter, setCountryFilter] = useState('');
-    const [measurementUnit, setMeasurementUnit] = useState('miles');
+    const [measurementUnit, setMeasurementUnit] = useState('mi');
     const [passengers, setPassengers] = useState('');
     const [flightSegments, setFlightSegments] = useState([{ departure: null, destination: null }]);
     const [currentSegmentIndex, setCurrentSegmentIndex] = useState(null);

@@ -10,6 +10,7 @@ using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Interface;
 
 namespace ReqNrollTests.StepDefinitions
 {
@@ -100,7 +101,7 @@ namespace ReqNrollTests.StepDefinitions
             {
                 type = "flight",
                 passengers = 1,
-                legs = new FlightLegs[]
+                legs = new List<FlightLegs>()
                 {
                     new FlightLegs { departure_airport = "LAX", destination_airport = "JFK" }
                 },

@@ -26,23 +26,23 @@ namespace GalutinisProjektas.Server.Controllers
         }
 
 
-         /// <summary>
-         /// Retrieves air pollution data based on coordinates 
-         /// </summary>
-         /// <param name="latitude">The latitude of the location</param>
-         /// <param name="longitude">The longitude of the location</param>
-         /// <returns> The air pollution data for the specified location</returns>
-         /// <remarks>
-         ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
-         ///  </remarks>
-         /// <response code="200">Returns the air pollution data for the specified location</response>
-         /// <response code="400">If the request is invalid</response>
+        /// <summary>
+        /// Retrieves air pollution data based on coordinates 
+        /// </summary>
+        /// <param name="latitude">The latitude of the location</param>
+        /// <param name="longitude">The longitude of the location</param>
+        /// <returns> The air pollution data for the specified location</returns>
+        /// <remarks>
+        ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
+        ///  </remarks>
+        /// <response code="201">Returns the air pollution data for the specified location</response>
+        /// <response code="400">If the request is invalid</response>
 
 
-        [HttpPost(Name = RouteName)]
+        [HttpGet(Name = RouteName)]
         [ProducesResponseType(typeof(AirPollutionResponse), 200)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AirPollutionResponse>> Post([Required] double latitude, [Required] double longitude)
+        public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
         {
             try
             {
@@ -63,24 +63,28 @@ namespace GalutinisProjektas.Server.Controllers
                 var airPollutionResponse = serviceResponse.Data;
                 if (airPollutionResponse == null)
                 {
-
-                    Href = Url.Link(RouteName, new { latitude, longitude }),
-                    Rel = "self",
-                    Method = "Get"
-                });
-
-                    return StatusCode(500, "Internal server error");
+                    airPollutionResponse.Links = new List<HATEOASLink>
+                    {
+                        new HATEOASLink
+                        {
+                            Href = Url.Link(RouteName, new { latitude, longitude }),
+                            Rel = "self",
+                            Method = "Get"
+                        }
+                    };
                 }
-
                 airPollutionResponse.Links = new List<HATEOASLink>
                 {
                     new HATEOASLink
                     {
-                        Href = Url.Action(nameof(Post), new { latitude, longitude }),
+                        Href = Url.Action(nameof(Get), new { latitude, longitude }),
                         Rel = "self",
-                        Method = "POST"
+                        Method = "Get"
                     }
                 };
+
+
+
 
 
                 return Ok(airPollutionResponse);
@@ -93,3 +97,7 @@ namespace GalutinisProjektas.Server.Controllers
         }
     }
 }
+
+
+    
+

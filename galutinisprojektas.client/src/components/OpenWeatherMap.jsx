@@ -15,7 +15,7 @@ const OpenWeatherMap = () => {
         setError(null);
         try {
             const response = await fetch(`/OpenWeatherMap?latitude=${coordinates.lat}&longitude=${coordinates.lng}`, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 },
