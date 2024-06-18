@@ -1,4 +1,6 @@
 using GalutinisProjektas.Server.Entity;
+using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Interface;
 using GalutinisProjektas.Server.Models;
 using GalutinisProjektas.Server.Service;
 using Microsoft.EntityFrameworkCore;
@@ -18,8 +20,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContextPool<ModeldbContext>(options =>
     options.UseMySQL(connectionString: builder.Configuration.GetConnectionString("DefaultConnection"))
- .EnableSensitiveDataLogging()  // Enable to log parameter values
-               .LogTo(Console.WriteLine, LogLevel.Information));  // Log SQL statements to console
+ .EnableSensitiveDataLogging()  
+               .LogTo(Console.WriteLine, LogLevel.Information));  
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -43,9 +45,8 @@ builder.Services.AddSwaggerGen(options =>
 }
 );
 // Add OpenWeatherMap service
-builder.Services.AddSingleton<OpenWeatherMapService>();
-// Add CarbonInterface service
-builder.Services.AddSingleton<CarbonInterfaceService>();
+builder.Services.AddSingleton<IOpenWeatherMapService, OpenWeatherMapService>();
+builder.Services.AddScoped<ICarbonInterfaceService, CarbonInterfaceService>();
 // Add CountryCodes service
 builder.Services.AddScoped<CountryCodesService>();
 // Add IATACodes service

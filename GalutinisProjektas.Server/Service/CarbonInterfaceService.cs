@@ -1,4 +1,6 @@
-﻿using GalutinisProjektas.Server.Models.Carbon;
+﻿using GalutinisProjektas.Server.Interface;
+using GalutinisProjektas.Server.Interfaces;
+using GalutinisProjektas.Server.Models.Carbon;
 using GalutinisProjektas.Server.Models.ElectricityResponse;
 using GalutinisProjektas.Server.Models.FlightResponse;
 using GalutinisProjektas.Server.Models.FuelCombustionResponse;
@@ -10,10 +12,13 @@ using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
+
     /// <summary>
     /// A service class for interacting with Carbon Interface API to retrieve carbon emissions estimates.
     /// </summary>
-    public class CarbonInterfaceService
+
+    public class CarbonInterfaceService : ICarbonInterfaceService
+
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<CarbonInterfaceService> _logger;

@@ -148,12 +148,41 @@ namespace GalutinisProjektas.Server.Controllers
             }
         }
 
+
         /// <summary>
         /// Creates an IATACodesResponse object with HATEOAS links.
         /// </summary>
         /// <param name="method">HTTP method.</param>
         /// <param name="iataCodes">IATA codes entity.</param>
         /// <returns>Returns an IATACodesResponse object.</returns>
+        [HttpGet("GetByCountry/{country}")]
+        public async Task<ActionResult<IEnumerable<IATACodes>>> GetByCountry([Required] string country)
+        {
+            try
+            {
+                var cacheKey = $"{IATAcacheKey}{country}";
+                if (!_memoryCache.TryGetValue(cacheKey, out IEnumerable<IATACodes> cacheEntry))
+                {
+                    var iataCodes = await _iataCodesService.GetIATACodesByCountryAsync(country);
+                    if (iataCodes == null)
+                    {
+                        return NotFound();
+                    }
+                    cacheEntry = iataCodes.Select(x => IATACodesResponse("GETBYCOUNTRY", x)).ToList();
+
+                    var cacheEntryOptions = new MemoryCacheEntryOptions()
+                        .SetSlidingExpiration(TimeSpan.FromHours(5))
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    _memoryCache.Set(cacheKey, cacheEntry, cacheEntryOptions);
+                }
+                return Ok(cacheEntry);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server Error");
+            }
+        }
         private IATACodesResponse IATACodesResponse(string method, IATACodes iataCodes)
         {
             var iataCodesResponse = new IATACodesResponse
@@ -177,12 +206,20 @@ namespace GalutinisProjektas.Server.Controllers
         /// <returns>Returns a list of HATEOAS links.</returns>
         private List<HATEOASLink> HATEOASLinks(string method, IATACodes iataCodes)
         {
+            if (Url == null)
+            {
+                return new List<HATEOASLink>();
+            }
+
             var links = new List<HATEOASLink>
             {
-               (method == "GET") ? new HATEOASLink { Href = Url.Action("GetIATACodes", null), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = "/IATACodes", Rel = "Get all IATA Codes", Method = "GET" },
-               (method == "GETID") ? new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Get IATA Code by ID", Method = "GET" },
-               (method == "GETBYIATA") ? new HATEOASLink { Href = Url.Action("GetByIATA", new {  iataCodes.IATA }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetByIATA", new { iataCodes.IATA }), Rel = "Get IATA code information by IATA code", Method = "GET" }
-            };
+                   (method == "GET") ? new HATEOASLink { Href = Url.Action("GetIATACodes", null), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = "/IATACodes", Rel = "Get all IATA Codes", Method = "GET" },
+                (method == "GETID") ? new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetIATACodes", new { id = iataCodes.Id }), Rel = "Get IATA Code by ID", Method = "GET" },
+                (method == "GETBYIATA") ? new HATEOASLink { Href = Url.Action("GetByIATA", new { iataCodes.IATA }), Rel = "Self", Method = "GET" } : new HATEOASLink { Href = Url.Action("GetByIATA", new { iataCodes.IATA }), Rel = "Get IATA code information by IATA code", Method = "GET" }
+           
+
+        };
+
             return links;
         }
 

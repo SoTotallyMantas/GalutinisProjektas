@@ -31,7 +31,7 @@ namespace GalutinisProjektas.Server.Models.Carbon
         /// </summary>
         [Required]
         [SwaggerSchema("Flight Departure/Destination Array")]
-        public required FlightLegs[] legs { get; set; }
+        public required List<FlightLegs> legs { get; set; } = new List<FlightLegs>();
 
         /// <summary>
         /// Gets or sets the distance unit of the flight.
