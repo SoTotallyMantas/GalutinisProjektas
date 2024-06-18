@@ -1,0 +1,118 @@
+body {
+    background-color: #ecf0f1;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #ecf0f1;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.left-section,
+.right-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.right-section {
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+.left-section {
+    margin-right: 10%;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+    .input-group label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .input-group input {
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        font-size: 1.25em;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+        .input-group input:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 5px rgba(33, 150, 243, 0.5);
+            outline: none;
+        }
+
+.data-table-container {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.table-header {
+    display: flex;
+    background-color: #f1f1f1;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.table-row {
+    display: flex;
+    width: 100%;
+}
+
+.table-cell {
+    flex: 1;
+    padding: 10px;
+    text-align: left;
+    border-right: 1px solid #ccc;
+}
+
+    .table-cell:last-child {
+        border-right: none;
+    }
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+    .button-group button {
+        padding: 10px 20px;
+        background-color: #2196F3;
+        color: white;
+        border: none;
+        cursor: pointer;
+        flex: 1;
+        margin-right: 10px;
+    }
+
+        .button-group button:last-child {
+            margin-right: 0;
+        }
+
+        .button-group button:hover {
+            background-color: #1976D2;
+        }
+
+.result-button {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+    .result-button:hover {
+        background-color: #1976D2;
+    }

@@ -1,0 +1,28 @@
+.api-card {
+    border: 1px solid #bdc3c7;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin: 10px;
+    width: 300px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.api-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.api-card button {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+    .api-card button:hover {
+        background-color: #2980b9;
+    }
