@@ -10,7 +10,7 @@ using System.Text.Json;
 
 namespace GalutinisProjektas.Server.Service
 {
-    public class CarbonInterfaceService
+    public class CarbonInterfaceService : ICarbonInterfaceService
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<CarbonInterfaceService> _logger;

@@ -1,12 +1,12 @@
-﻿using GalutinisProjektas.Server.Models;
-using GalutinisProjektas.Server.Models.AirPollutionResponse;
-using GalutinisProjektas.Server.Models.UtilityModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using GalutinisProjektas.Server.Service;
-using Microsoft.AspNetCore.Mvc;
+using GalutinisProjektas.Server.Models.AirPollutionResponse;
+using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-
+using GalutinisProjektas.Server.Models.UtilityModels;
+using System;
+//n
 namespace GalutinisProjektas.Server.Controllers
 {
     [ApiController]
@@ -18,11 +18,9 @@ namespace GalutinisProjektas.Server.Controllers
     {
         private const string RouteName = "air-pollution";
         private readonly ILogger<OpenWeatherMapController> _logger;
-        private readonly OpenWeatherMapService _openWeatherMapService;
-        
-        
+        private readonly IOpenWeatherMapService _openWeatherMapService;
 
-        public OpenWeatherMapController(ILogger<OpenWeatherMapController> logger,OpenWeatherMapService openWeatherMapService)
+        public OpenWeatherMapController(ILogger<OpenWeatherMapController> logger, IOpenWeatherMapService openWeatherMapService)
         {
             _openWeatherMapService = openWeatherMapService;
             _logger = logger;
@@ -42,24 +40,34 @@ namespace GalutinisProjektas.Server.Controllers
         [HttpPost(Name = RouteName)]
         [ProducesResponseType(typeof(AirPollutionResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        
         public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
         {
             try
             {
                 var serviceResponse = await _openWeatherMapService.GetAirPollutionDataAsync(latitude, longitude);
+                if (serviceResponse == null)
+                {
+                    return StatusCode(500, "Internal server error");
+                }
+
                 if (serviceResponse.StatusCode != 201)
                 {
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }
 
                 var airPollutionResponse = serviceResponse.Data;
+                if (airPollutionResponse == null)
+                {
+                    return StatusCode(500, "Internal server error");
+                }
+
                 airPollutionResponse.Links.Add(new HATEOASLink
                 {
-                    Href = Url.Link(RouteName, new { latitude, longitude }),
+                    Href = Url.Action(RouteName, new { latitude, longitude }),
                     Rel = "self",
                     Method = "Post"
                 });
+
                 return Ok(airPollutionResponse);
             }
             catch (Exception ex)
@@ -67,10 +75,6 @@ namespace GalutinisProjektas.Server.Controllers
                 _logger.LogError($"Exception occurred while fetching data from OpenWeatherMap API: {ex.Message}");
                 return StatusCode(500, "Internal server error");
             }
-            
-           
         }
-
-       
     }
 }
