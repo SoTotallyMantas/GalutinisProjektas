@@ -25,35 +25,18 @@ namespace GalutinisProjektas.Server.Controllers
             _logger = logger;
         }
 
-
-         /// <summary>
-         /// Retrieves air pollution data based on coordinates 
-         /// </summary>
-         /// <param name="latitude">The latitude of the location</param>
-         /// <param name="longitude">The longitude of the location</param>
-         /// <returns> The air pollution data for the specified location</returns>
-         /// <remarks>
-         ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
-         ///  </remarks>
-         /// <response code="200">Returns the air pollution data for the specified location</response>
-         /// <response code="400">If the request is invalid</response>
-
-
         [HttpPost(Name = RouteName)]
-        [ProducesResponseType(typeof(AirPollutionResponse), 200)]
+        [ProducesResponseType(typeof(AirPollutionResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<AirPollutionResponse>> Post([Required] double latitude, [Required] double longitude)
         {
             try
             {
                 var serviceResponse = await _openWeatherMapService.GetAirPollutionDataAsync(latitude, longitude);
-
-
                 if (serviceResponse == null)
                 {
                     return StatusCode(500, "Internal server error");
                 }
-
 
                 if (serviceResponse.StatusCode != 200)
                 {
@@ -63,12 +46,6 @@ namespace GalutinisProjektas.Server.Controllers
                 var airPollutionResponse = serviceResponse.Data;
                 if (airPollutionResponse == null)
                 {
-
-                    Href = Url.Link(RouteName, new { latitude, longitude }),
-                    Rel = "self",
-                    Method = "Get"
-                });
-
                     return StatusCode(500, "Internal server error");
                 }
 
@@ -81,7 +58,6 @@ namespace GalutinisProjektas.Server.Controllers
                         Method = "POST"
                     }
                 };
-
 
                 return Ok(airPollutionResponse);
             }
