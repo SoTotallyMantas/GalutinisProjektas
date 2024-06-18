@@ -5,15 +5,14 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using System;
+using GalutinisProjektas.Server.Interface;
+using System.Collections.Generic;
 using GalutinisProjektas.Server.Interfaces;
-//n
+
 namespace GalutinisProjektas.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    ///<summary>
-    /// Controller for retrieving air pollution data
-    /// </summary>
     public class OpenWeatherMapController : Controller
     {
         private const string RouteName = "air-pollution";
@@ -26,21 +25,10 @@ namespace GalutinisProjektas.Server.Controllers
             _logger = logger;
         }
 
-         /// <summary>
-         /// Retrieves air pollution data based on coordinates 
-         /// </summary>
-         /// <param name="latitude">The latitude of the location</param>
-         /// <param name="longitude">The longitude of the location</param>
-         /// <returns> The air pollution data for the specified location</returns>
-         /// <remarks>
-         ///  Queries the OpenWeatherMap API for air pollution data based on the specified coordinates
-         ///  </remarks>
-         /// <response code="201">Returns the air pollution data for the specified location</response>
-         /// <response code="400">If the request is invalid</response>
         [HttpPost(Name = RouteName)]
         [ProducesResponseType(typeof(AirPollutionResponse), 201)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<AirPollutionResponse>> Get([Required] double latitude, [Required] double longitude)
+        public async Task<ActionResult<AirPollutionResponse>> Post([Required] double latitude, [Required] double longitude)
         {
             try
             {
@@ -50,7 +38,7 @@ namespace GalutinisProjektas.Server.Controllers
                     return StatusCode(500, "Internal server error");
                 }
 
-                if (serviceResponse.StatusCode != 201)
+                if (serviceResponse.StatusCode != 200)
                 {
                     return StatusCode(serviceResponse.StatusCode, serviceResponse.ErrorMessage);
                 }
@@ -61,12 +49,15 @@ namespace GalutinisProjektas.Server.Controllers
                     return StatusCode(500, "Internal server error");
                 }
 
-                airPollutionResponse.Links.Add(new HATEOASLink
+                airPollutionResponse.Links = new List<HATEOASLink>
                 {
-                    Href = Url.Action(RouteName, new { latitude, longitude }),
-                    Rel = "self",
-                    Method = "Post"
-                });
+                    new HATEOASLink
+                    {
+                        Href = Url.Action(nameof(Post), new { latitude, longitude }),
+                        Rel = "self",
+                        Method = "POST"
+                    }
+                };
 
                 return Ok(airPollutionResponse);
             }
