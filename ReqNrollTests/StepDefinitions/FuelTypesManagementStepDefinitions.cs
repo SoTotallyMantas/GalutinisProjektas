@@ -11,6 +11,7 @@ using GalutinisProjektas.Server.Entity;
 using GalutinisProjektas.Server.Models.HATEOASResourceModels;
 using GalutinisProjektas.Server.Models.UtilityModels;
 using GalutinisProjektas.Server.Service;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace ReqNrollTests.StepDefinitions
 {
@@ -24,7 +25,8 @@ namespace ReqNrollTests.StepDefinitions
         private Mock<IUrlHelper> _urlHelperMock;
         private FuelTypesController _controller;
         private ActionResult<IEnumerable<FuelTypes>> _listResult;
-        private ActionResult<FuelTypesResponse> _singleResult;
+        private ActionResult<FuelTypesResponse> secondresult;
+        private ActionResult<FuelTypes> _singleResult;
 
         private void SetupInMemoryDatabase()
         {
@@ -65,6 +67,17 @@ namespace ReqNrollTests.StepDefinitions
             if (_dbContext == null)
             {
                 SetupInMemoryDatabase();
+
+                // Setup mock UrlHelper
+                _urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+                              .Returns((UrlActionContext context) => $"{context.Action}/{context.Controller}");
+
+                // Setup mock MemoryCache
+                object cacheValue;
+                _memoryCacheMock.Setup(m => m.TryGetValue(It.IsAny<object>(), out cacheValue))
+                                .Returns(false);
+                _memoryCacheMock.Setup(m => m.CreateEntry(It.IsAny<object>()))
+                                .Returns(Mock.Of<ICacheEntry>());
             }
         }
 
@@ -94,13 +107,24 @@ namespace ReqNrollTests.StepDefinitions
             if (_dbContext == null)
             {
                 SetupInMemoryDatabase();
+
+                // Setup mock UrlHelper
+                _urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+                              .Returns((UrlActionContext context) => $"{context.Action}/{context.Controller}");
+
+                // Setup mock MemoryCache
+                object cacheValue;
+                _memoryCacheMock.Setup(m => m.TryGetValue(It.IsAny<object>(), out cacheValue))
+                                .Returns(false);
+                _memoryCacheMock.Setup(m => m.CreateEntry(It.IsAny<object>()))
+                                .Returns(Mock.Of<ICacheEntry>());
             }
         }
 
         [When("I request the fuel type by ID {int}")]
         public async Task WhenIRequestTheFuelTypeByID(int id)
         {
-            _singleResult = await ConvertToFuelTypesResponse(_controller.GetFuelTypes(id));
+            _singleResult = await _controller.GetFuelTypes(id);
         }
 
         [Then("the response should be successful and contain the fuel type")]
@@ -123,42 +147,55 @@ namespace ReqNrollTests.StepDefinitions
             if (_dbContext == null)
             {
                 SetupInMemoryDatabase();
-            }
 
-            var existingFuelType = _dbContext.FuelTypes.FirstOrDefault(ft => ft.FuelName == fuelTypeName);
-            if (existingFuelType == null)
-            {
-                var fuelType = new FuelTypes
+                // Setup mock UrlHelper
+                _urlHelperMock.Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+                              .Returns((UrlActionContext context) => $"{context.Action}/{context.Controller}");
+
+                // Setup mock MemoryCache
+                object cacheValue;
+                _memoryCacheMock.Setup(m => m.TryGetValue(It.IsAny<object>(), out cacheValue))
+                                .Returns(false);
+                _memoryCacheMock.Setup(m => m.CreateEntry(It.IsAny<object>()))
+                                .Returns(Mock.Of<ICacheEntry>());
+
+                var existingFuelType = _dbContext.FuelTypes.FirstOrDefault(ft => ft.FuelName == fuelTypeName);
+                if (existingFuelType == null)
                 {
-                    Id = _dbContext.FuelTypes.Max(ft => ft.Id) + 1, // Ensure unique ID
-                    FuelName = fuelTypeName,
-                    FuelType = fuelTypeName.ToLower(),
-                    FuelUnit = "liter"
-                };
+                    var fuelType = new FuelTypes
+                    {
+                        Id = _dbContext.FuelTypes.Max(ft => ft.Id) + 1, // Ensure unique ID
+                        FuelName = fuelTypeName,
+                        FuelType = fuelTypeName.ToLower(),
+                        FuelUnit = "liter"
+                    };
 
-                _dbContext.FuelTypes.Add(fuelType);
-                _dbContext.SaveChanges();
+                    _dbContext.FuelTypes.Add(fuelType);
+                    _dbContext.SaveChanges();
+                }
             }
         }
 
         [When("I request the fuel type by name {string}")]
         public async Task WhenIRequestTheFuelTypeByName(string name)
         {
-            _singleResult = await ConvertToFuelTypesResponse(_controller.GetByFuelType(name));
+            secondresult = await ConvertToFuelTypesResponse(_controller.GetByFuelType(name));
         }
 
         [Then("the response should be successful and contain the fuel type by name")]
         public void ThenTheResponseShouldBeSuccessfulAndContainTheFuelTypeByName()
         {
-            Assert.IsNotNull(_singleResult, "_singleResult is null");
-            Assert.IsInstanceOf<ObjectResult>(_singleResult.Result, "_singleResult.Result is not an OkObjectResult");
 
-            var okResult = _singleResult.Result as ObjectResult;
+            var okResult = secondresult.Result as ObjectResult;
             Assert.IsNotNull(okResult, "okResult is null");
 
-            var fuelType = okResult.Value as FuelTypesResponse;
-            Assert.IsNotNull(fuelType, "fuelType is null");
-            Assert.AreEqual("diesel", fuelType.FuelType, "fuelType.FuelType is not diesel");
+            var fuelTypes = okResult.Value as List<FuelTypesResponse>;
+            Assert.IsNotNull(fuelTypes, "fuelTypes is null");
+            Assert.AreEqual(2, fuelTypes.Count, "fuelTypes does not contain 2 elements");
+
+            var fuelType = fuelTypes.FirstOrDefault(ft => ft.FuelType == "diesel");
+            Assert.IsNotNull(fuelType, "fuelType with FuelType 'diesel' is null");
+
         }
 
         private async Task<ActionResult<FuelTypesResponse>> ConvertToFuelTypesResponse(Task<ActionResult<FuelTypes>> task)

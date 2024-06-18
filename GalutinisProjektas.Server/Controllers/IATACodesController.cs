@@ -147,7 +147,7 @@ namespace GalutinisProjektas.Server.Controllers
         {
             if (Url == null)
             {
-                return new List<HATEOASLink>(); // or return null if that fits your design better
+                return new List<HATEOASLink>();
             }
 
             var links = new List<HATEOASLink>
